@@ -1,4 +1,4 @@
-package com.codeit.findex.domain.sync.dto;
+package com.codeit.findex.infra.openapi;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
