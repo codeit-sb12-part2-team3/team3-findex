@@ -28,21 +28,21 @@ public class OpenApiResponseDto {
     @Getter
     @NoArgsConstructor
     public static class Body {
-        private int numOfRows;
-        private int pageNo;
-        private int totalCount;
+        private Integer numOfRows;
+        private Integer pageNo;
+        private Integer totalCount;
         private Items items;
     }
 
     @Getter
     @NoArgsConstructor
     public static class Items {
-        private List<Item> item;
+        private List<IndexItem> item;
     }
 
     @Getter
     @NoArgsConstructor
-    public static class Item {
+    public static class IndexItem {
         private String basDt; // 기준일자
         private String idxNm; // 지수명
         private String idxCsf; // 지수분류
