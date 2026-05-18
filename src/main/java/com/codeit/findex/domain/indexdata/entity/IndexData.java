@@ -24,7 +24,7 @@ public class IndexData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
-    private Long id;
+    private UUID id;
 
     @Column(name = "index_id", nullable = false)
     private UUID indexId;
