@@ -3,6 +3,8 @@ package com.codeit.findex.domain.indexdata.dto;
 import com.codeit.findex.domain.indexdata.entity.SourceType;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -10,17 +12,17 @@ import lombok.*;
 public class IndexDataUpdateRequest {
     private SourceType sourceType;
 
-    private Double marketPrice;
+    private BigDecimal marketPrice;
 
-    private Double closingPrice;
+    private BigDecimal closingPrice;
 
-    private Double highPrice;
+    private BigDecimal highPrice;
 
-    private Double lowPrice;
+    private BigDecimal lowPrice;
 
-    private Double versus;
+    private BigDecimal versus;
 
-    private Double fluctuationRate;
+    private BigDecimal fluctuationRate;
 
     private Long tradeQuantity;
 

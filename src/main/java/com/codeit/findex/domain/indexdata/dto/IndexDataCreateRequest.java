@@ -6,7 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -17,21 +18,21 @@ public class IndexDataCreateRequest {
 
     private UUID indexId;
 
-    private Date baseDate;
+    private LocalDate baseDate;
 
     private SourceType sourceType;
 
-    private Double marketPrice;
+    private BigDecimal marketPrice;
 
-    private Double closingPrice;
+    private BigDecimal closingPrice;
 
-    private Double highPrice;
+    private BigDecimal highPrice;
 
-    private Double lowPrice;
+    private BigDecimal lowPrice;
 
-    private Double versus;
+    private BigDecimal versus;
 
-    private Double fluctuationRate;
+    private BigDecimal fluctuationRate;
 
     private Long tradeQuantity;
 
