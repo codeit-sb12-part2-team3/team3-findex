@@ -3,15 +3,15 @@ spring:
     name: findex
 
   datasource:
-    url: jdbc:postgresql://yamanote.proxy.rlwy.net:44055/railway
-    username: postgres
-    password: BRVEciPtrzlkJIDoasNSiGrUMMWZqHvL
+    url:
+    username:
+    password:
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: none
     show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+
+openapi:
+  service-key:
