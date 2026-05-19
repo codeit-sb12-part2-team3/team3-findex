@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-public interface IndexDataRepository extends JpaRepository<IndexData, Long> {
+public interface IndexDataRepository extends JpaRepository<IndexData, UUID>  {
 
     Optional<IndexData> findByIndexId(UUID indexId);
 

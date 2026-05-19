@@ -2,11 +2,14 @@ package com.codeit.findex.domain.indexdata.controller;
 
 import com.codeit.findex.domain.indexdata.dto.IndexDataCreateRequest;
 import com.codeit.findex.domain.indexdata.dto.IndexDataResponse;
+import com.codeit.findex.domain.indexdata.dto.IndexDataUpdateRequest;
 import com.codeit.findex.domain.indexdata.service.IndexDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 
 @RestController
@@ -21,5 +24,13 @@ public class IndexDataController {
             @RequestBody IndexDataCreateRequest request) {
         IndexDataResponse created = indexDataService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<IndexDataResponse> update(
+            @PathVariable UUID id,
+            @RequestBody IndexDataUpdateRequest request){
+        IndexDataResponse updated = indexDataService.update(id,request);
+        return ResponseEntity.status(HttpStatus.OK).body(updated);
     }
 }
