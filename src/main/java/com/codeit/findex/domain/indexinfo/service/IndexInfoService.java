@@ -82,6 +82,13 @@ public class IndexInfoService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
     }
 
+    // 지수 정보 삭제
+    public void delete(UUID id) {
+        getIndexInfo(id);
+        indexInfoRepository.deleteById(id);
+        indexInfoRepository.flush();
+    }
+
     // Entity → Response DTO 변환
     private IndexInfoResponse toResponse(IndexInfo indexInfo) {
 

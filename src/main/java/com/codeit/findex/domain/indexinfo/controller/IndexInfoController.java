@@ -58,4 +58,13 @@ public class IndexInfoController {
                 indexInfoService.update(id, request)
         );
     }
+
+    // 지수 정보 삭제 API
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable UUID id
+    ) {
+        indexInfoService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
