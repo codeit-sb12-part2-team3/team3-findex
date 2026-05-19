@@ -1,27 +1,27 @@
 package com.codeit.findex.domain.dashboard.controller;
 
 import com.codeit.findex.domain.dashboard.dto.DashboardSummaryResponse;
-import com.codeit.findex.domain.dashboard.service.DashboardService;
+import com.codeit.findex.domain.dashboard.service.DashboardFavoriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/dashboards")
 @RequiredArgsConstructor
+@RequestMapping("/api/index-data")
 public class DashboardController {
 
-    private final DashboardService dashboardService;
+    private final DashboardFavoriteService dashboardFavoriteService;
 
-    @GetMapping("/summary")
-    public ResponseEntity<List<DashboardSummaryResponse>> getFavoriteIndexSummaries() {
 
-        List<DashboardSummaryResponse> responses = dashboardService.getFavoriteIndexSummaries();
-
-        return ResponseEntity.ok(responses);
+    @GetMapping("/performance/favorite")
+    public ResponseEntity<List<DashboardSummaryResponse>> getFavorites(
+            @RequestParam(required = false) String periodType
+    ) {
+        return ResponseEntity.ok(
+                dashboardFavoriteService.getSummary()
+        );
     }
 }

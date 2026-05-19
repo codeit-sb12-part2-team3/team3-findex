@@ -10,10 +10,13 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface DashboardMapper {
 
-    @Mapping(source = "indexInfo.id", target = "indexId")
-    @Mapping(source = "indexInfo.indexName", target = "indexName")
+    @Mapping(source = "indexInfo.id", target = "indexInfoId")
     @Mapping(source = "indexInfo.indexClassification", target = "indexClassification")
-    @Mapping(source = "indexInfo.favorite", target = "favorite")
+    @Mapping(source = "indexInfo.indexName", target = "indexName")
+    @Mapping(source = "versus", target = "versus")
+    @Mapping(source = "fluctuationRate", target = "fluctuationRate")
+    @Mapping(source = "closingPrice", target = "currentPrice")
+    @Mapping(expression = "java(indexData.getClosingPrice().subtract(indexData.getVersus()))", target = "beforePrice")
     DashboardSummaryResponse toDto(IndexData indexData);
 
     List<DashboardSummaryResponse> toDtoList(List<IndexData> indexDataList);

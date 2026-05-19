@@ -11,10 +11,7 @@ import java.util.UUID;
 @Builder
 public class DashboardSummaryResponse {
 
-    private UUID indexId;
-
-    private String indexName;
-
+    private UUID indexInfoId;
     private String indexClassification;
 
     private LocalDate baseDate;
@@ -25,5 +22,6 @@ public class DashboardSummaryResponse {
 
     private BigDecimal fluctuationRate;
 
-    private Boolean favorite;
+    private BigDecimal currentPrice;
+    private BigDecimal beforePrice;
 }
