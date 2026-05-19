@@ -44,7 +44,12 @@ public class AutoSync {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void updateEnabled(Boolean enabled) { // 상태 변경 메서드 추가
+    public void updateEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+    // 새로운 엔티티 생성을 위한 생성자
+    public AutoSync(IndexInfo indexInfo, Boolean enabled) {
+        this.indexInfo = indexInfo;
         this.enabled = enabled;
     }
 }
