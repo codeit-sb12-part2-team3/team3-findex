@@ -2,6 +2,7 @@ package com.codeit.findex.domain.indexinfo.service;
 
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoCreateRequest;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoResponse;
+import com.codeit.findex.domain.indexinfo.dto.IndexInfoUpdateRequest;
 import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
 import com.codeit.findex.global.exception.BusinessException;
@@ -53,15 +54,37 @@ public class IndexInfoService {
     // 지수 정보 단건 조회
     @Transactional(readOnly = true)
     public IndexInfoResponse findById(UUID id) {
-        IndexInfo indexInfo = indexInfoRepository.findById(id)
-                // 데이터가 없을 경우 공통 예외 처리
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+
+        return toResponse(getIndexInfo(id));
+    }
+
+    // 지수 정보 수정
+    public IndexInfoResponse update(
+            UUID id,
+            IndexInfoUpdateRequest request
+    ) {
+        IndexInfo indexInfo = getIndexInfo(id);
+
+        indexInfo.update(
+                request.employedItemsCount(),
+                request.basePointInTime(),
+                request.baseIndex(),
+                request.favorite()
+        );
+
         return toResponse(indexInfo);
     }
 
+    // id 기준 지수 정보 조회
+    private IndexInfo getIndexInfo(UUID id) {
 
-    // Entity -> Response DTO 변환
+        return indexInfoRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+    }
+
+    // Entity → Response DTO 변환
     private IndexInfoResponse toResponse(IndexInfo indexInfo) {
+
         return new IndexInfoResponse(
                 indexInfo.getId(),
                 indexInfo.getIndexName(),

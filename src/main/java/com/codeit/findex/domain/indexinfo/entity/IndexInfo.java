@@ -50,4 +50,17 @@ public class IndexInfo {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public void update(
+
+            Integer employedItemsCount,
+            LocalDate basePointInTime,
+            BigDecimal baseIndex,
+            Boolean favorite
+    ) {
+        this.employedItemsCount = employedItemsCount;
+        this.basePointInTime = basePointInTime;
+        this.baseIndex = baseIndex;
+        this.favorite = favorite;
+    }
 }
