@@ -1,8 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://yamanote.proxy.rlwy.net:44055/railway
-    username: postgres
-    password: BRVEciPtrzlkJIDoasNSiGrUMMWZqHvL
-
-open-api:
-  service-key: bc8f6e4f29a518481711905f3b1ee6ae18e7a66a54b4ae8bd12531643e1fa59b
