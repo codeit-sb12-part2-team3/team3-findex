@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum SourceType {
-    USER ("사용자","사용자로부터 data update"),
-    OPENAPI("Open API", "Open API로부터 data update");
+    USER("사용자","사용자로부터 data update"),
+    OPEN_API("Open API", "Open API로부터 data update");
 
     private final String name;
     private final String description;
+
+
 }

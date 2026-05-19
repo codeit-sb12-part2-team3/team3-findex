@@ -1,41 +1,34 @@
 package com.codeit.findex.domain.indexdata.dto;
 
 import com.codeit.findex.domain.indexdata.entity.SourceType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class IndexDataCreateRequest {
+public record IndexDataCreateRequest(
+        UUID indexId,
 
-    private UUID indexId;
+        LocalDate baseDate,
 
-    private Date baseDate;
+        SourceType sourceType,
 
-    private SourceType sourceType;
+        BigDecimal marketPrice,
 
-    private Double marketPrice;
+        BigDecimal closingPrice,
 
-    private Double closingPrice;
+        BigDecimal highPrice,
 
-    private Double highPrice;
+        BigDecimal lowPrice,
 
-    private Double lowPrice;
+        BigDecimal versus,
 
-    private Double versus;
+        BigDecimal fluctuationRate,
 
-    private Double fluctuationRate;
+        Long tradeQuantity,
 
-    private Long tradeQuantity;
+        Long tradePrice,
 
-    private Long tradePrice;
-
-    private Long marketTotalAmount;
+        Long marketTotalAmount
+) {
 }

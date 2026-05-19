@@ -5,8 +5,9 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -16,13 +17,14 @@ uniqueConstraints = {
                 name = "uk_indexdata_indexid_basedate",
                 columnNames = {"index_id","base_date"})
 })
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter @Setter
+@Builder
 public class IndexData {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(updatable = false, nullable = false)
     private UUID id;
 
@@ -31,34 +33,35 @@ public class IndexData {
 
     @Column(name = "base_date",nullable = false,
     columnDefinition = "기준 일자")
-    private Date baseDate;
+    private LocalDate baseDate;
 
     @Column(name = "source_type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private SourceType sourceType;
 
     @Column(name = "market_price", nullable = false,
     columnDefinition = "시가")
-    private Double marketPrice;
+    private BigDecimal marketPrice;
 
     @Column(name = "closing_price", nullable = false,
     columnDefinition = "종가")
-    private Double closingPrice;
+    private BigDecimal closingPrice;
 
     @Column(name = "high_price", nullable = false,
     columnDefinition = "고가")
-    private Double highPrice;
+    private BigDecimal highPrice;
 
     @Column(name = "low_price", nullable = false,
             columnDefinition = "저가")
-    private Double lowPrice;
+    private BigDecimal lowPrice;
 
     @Column(nullable = false,
             columnDefinition = "대비")
-    private Double versus;
+    private BigDecimal versus;
 
     @Column(name = "fluctuation_rate",nullable = false,
             columnDefinition = "등락율")
-    private Double fluctuationRate;
+    private BigDecimal fluctuationRate;
 
     @Column(name = "trade_quantity", nullable = false,
             columnDefinition = "거래량")
