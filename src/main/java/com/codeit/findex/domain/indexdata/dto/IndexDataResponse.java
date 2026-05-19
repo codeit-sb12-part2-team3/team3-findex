@@ -2,41 +2,36 @@ package com.codeit.findex.domain.indexdata.dto;
 
 
 import com.codeit.findex.domain.indexdata.entity.SourceType;
-import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class IndexDataResponse {
+public record IndexDataResponse (
+        UUID id,
 
-    private UUID id;
+        UUID indexId,
 
-    private UUID indexId;
+        LocalDate baseDate,
 
-    private LocalDate baseDate;
+        SourceType sourceType,
 
-    private SourceType sourceType;
+        BigDecimal marketPrice,
 
-    private BigDecimal marketPrice;
+        BigDecimal closingPrice,
 
-    private BigDecimal closingPrice;
+        BigDecimal highPrice,
 
-    private BigDecimal highPrice;
+        BigDecimal lowPrice,
 
-    private BigDecimal lowPrice;
+        BigDecimal versus,
 
-    private BigDecimal versus;
+        BigDecimal fluctuationRate,
 
-    private BigDecimal fluctuationRate;
+        Long tradeQuantity,
 
-    private Long tradeQuantity;
+        Long tradePrice,
 
-    private Long tradePrice;
-
-    private Long marketTotalAmount;
+        Long marketTotalAmount
+){
 }

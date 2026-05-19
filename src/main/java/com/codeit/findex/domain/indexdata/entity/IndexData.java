@@ -7,7 +7,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -18,8 +17,8 @@ uniqueConstraints = {
                 name = "uk_indexdata_indexid_basedate",
                 columnNames = {"index_id","base_date"})
 })
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter @Setter
 @Builder
 public class IndexData {

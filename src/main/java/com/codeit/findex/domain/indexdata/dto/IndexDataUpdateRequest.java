@@ -1,32 +1,30 @@
 package com.codeit.findex.domain.indexdata.dto;
 
 import com.codeit.findex.domain.indexdata.entity.SourceType;
-import lombok.*;
 
 import java.math.BigDecimal;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class IndexDataUpdateRequest {
-    private SourceType sourceType;
+public record IndexDataUpdateRequest (
 
-    private BigDecimal marketPrice;
+        SourceType sourceType,
 
-    private BigDecimal closingPrice;
+        BigDecimal marketPrice,
 
-    private BigDecimal highPrice;
+        BigDecimal closingPrice,
 
-    private BigDecimal lowPrice;
+        BigDecimal highPrice,
 
-    private BigDecimal versus;
+        BigDecimal lowPrice,
 
-    private BigDecimal fluctuationRate;
+        BigDecimal versus,
 
-    private Long tradeQuantity;
+        BigDecimal fluctuationRate,
 
-    private Long tradePrice;
+        Long tradeQuantity,
 
-    private Long marketTotalAmount;
+        Long tradePrice,
+
+        Long marketTotalAmount
+) {
+
 }
