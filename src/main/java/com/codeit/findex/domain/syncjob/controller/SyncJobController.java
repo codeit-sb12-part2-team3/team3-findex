@@ -3,16 +3,15 @@ package com.codeit.findex.domain.syncjob.controller;
 import com.codeit.findex.domain.syncjob.dto.SyncJobListResponse;
 import com.codeit.findex.domain.syncjob.dto.SyncJobSearchCondition;
 import com.codeit.findex.domain.syncjob.service.SyncJobService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -52,6 +51,9 @@ public class SyncJobController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime lastJobTime,
 
+            @RequestParam(required = false)
+            UUID lastId,
+
             @RequestParam(defaultValue = "10")
             int size
 
@@ -70,9 +72,19 @@ public class SyncJobController {
         return syncJobService.getSyncJobList(
                 condition,
                 lastJobTime,
+                lastId,
                 size
         );
 
     }
 
+    @PostMapping("/index-info")
+    public List<SyncJobListResponse> syncIndexInfo(
+            @RequestParam List<String> indexNames,
+            HttpServletRequest request
+    ) {
+        String workerIp = request.getRemoteAddr();
+
+        return syncJobService.syncIndexInfo(indexNames, workerIp);
+    }
 }

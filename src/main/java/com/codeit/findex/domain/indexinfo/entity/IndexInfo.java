@@ -51,6 +51,11 @@ public class IndexInfo {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+
+    public void update(String indexClassification, Integer employedItemsCount) {
+        this.indexClassification = indexClassification;
+        this.employedItemsCount = employedItemsCount;
+
     public void update(
 
             Integer employedItemsCount,

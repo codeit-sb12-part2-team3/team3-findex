@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class SyncJobSpecification {
 
@@ -74,15 +75,22 @@ public class SyncJobSpecification {
         };
     }
 
-    public static Specification<SyncJob> cursor(LocalDateTime lastJobTime) {
-
+    public static Specification<SyncJob> cursor(
+            LocalDateTime lastJobTime, UUID lastId
+    ) {
         return (root, query, cb) -> {
 
-            if (lastJobTime == null) {
+            if (lastJobTime == null || lastId == null) {
                 return null;
             }
 
-            return cb.lessThan(root.get("jobTime"), lastJobTime);
+            return cb.or(
+                    cb.lessThan(root.get("jobTime"), lastJobTime),
+                    cb.and(
+                            cb.equal(root.get("jobTime"), lastJobTime),
+                            cb.lessThan(root.get("id"), lastId)
+                    )
+            );
         };
     }
 }
