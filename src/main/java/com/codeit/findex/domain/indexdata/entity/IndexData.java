@@ -37,6 +37,7 @@ public class IndexData {
     private LocalDate baseDate;
 
     @Column(name = "source_type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private SourceType sourceType;
 
     @Column(name = "market_price", nullable = false,
