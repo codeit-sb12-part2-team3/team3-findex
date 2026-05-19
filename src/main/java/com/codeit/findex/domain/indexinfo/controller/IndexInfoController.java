@@ -2,12 +2,15 @@ package com.codeit.findex.domain.indexinfo.controller;
 
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoCreateRequest;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoResponse;
+import com.codeit.findex.domain.indexinfo.dto.IndexInfoUpdateRequest;
 import com.codeit.findex.domain.indexinfo.service.IndexInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
+
 import java.util.UUID;
 
 @RestController
@@ -44,6 +47,17 @@ public class IndexInfoController {
     ) {
         return ResponseEntity.ok(
                 indexInfoService.findById(id)
+        );
+    }
+
+    // 지수 정보 수정 API
+    @PatchMapping("/{id}")
+    public ResponseEntity<IndexInfoResponse> update(
+            @PathVariable UUID id,
+            @RequestBody IndexInfoUpdateRequest request
+    ) {
+        return ResponseEntity.ok(
+                indexInfoService.update(id, request)
         );
     }
 }
