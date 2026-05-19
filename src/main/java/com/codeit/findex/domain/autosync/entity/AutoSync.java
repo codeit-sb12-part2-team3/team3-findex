@@ -1,6 +1,5 @@
 package com.codeit.findex.domain.autosync.entity;
 
-import
 import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
