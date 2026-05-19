@@ -50,4 +50,9 @@ public class IndexInfo {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public void update(String indexClassification, Integer employedItemsCount) {
+        this.indexClassification = indexClassification;
+        this.employedItemsCount = employedItemsCount;
+    }
 }

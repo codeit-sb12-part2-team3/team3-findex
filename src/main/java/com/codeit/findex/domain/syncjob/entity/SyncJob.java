@@ -32,7 +32,7 @@ public class SyncJob {
     @Column(name = "target_date")
     private LocalDate targetDate;
 
-    @Column(name = "worker", nullable = false, length = 20)
+    @Column(name = "worker", nullable = false, length = 45)
     private String worker;
 
     @Column(name = "job_time", nullable = false)
