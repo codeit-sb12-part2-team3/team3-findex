@@ -1,5 +1,7 @@
 package com.codeit.findex.domain.autosync.entity;
 
+import
+import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -41,5 +43,9 @@ public class AutoSync {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateEnabled(Boolean enabled) { // 상태 변경 메서드 추가
+        this.enabled = enabled;
     }
 }
