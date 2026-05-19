@@ -13,6 +13,6 @@ spring:
       ddl-auto: none
     show-sql: true
 
-openapi:
+open-api:
   service-key:
   base-url: https://apis.data.go.kr/1160100/service/GetMarketIndexInfoService

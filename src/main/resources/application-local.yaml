@@ -4,5 +4,5 @@ spring:
     username: postgres
     password: BRVEciPtrzlkJIDoasNSiGrUMMWZqHvL
 
-openapi:
+open-api:
   service-key: bc8f6e4f29a518481711905f3b1ee6ae18e7a66a54b4ae8bd12531643e1fa59b
