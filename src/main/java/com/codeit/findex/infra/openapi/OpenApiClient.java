@@ -54,18 +54,6 @@ public class OpenApiClient {
             throw new RuntimeException("Open API 요청 실패: " + resultMsg);
         }
 
-        if (response.getResponse().getBody() == null) {
-            throw new RuntimeException("Open API 응답 body가 없습니다.");
-        }
-
-        if (response.getResponse().getBody().getItems() == null) {
-            throw new RuntimeException("Open API 응답 items가 없습니다.");
-        }
-
-        if (response.getResponse().getBody().getItems().getItem() == null) {
-            throw new RuntimeException("Open API 응답 item이 없습니다.");
-        }
-
         return response;
     }
 }
