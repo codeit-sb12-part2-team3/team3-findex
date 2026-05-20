@@ -1,4 +1,5 @@
 package com.codeit.findex.domain.indexdata.entity;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -2,18 +2,15 @@ package com.codeit.findex.domain.indexdata.service;
 
 import com.codeit.findex.domain.indexdata.dto.*;
 import com.codeit.findex.domain.indexdata.entity.IndexData;
-import com.codeit.findex.domain.indexdata.entity.PeriodType;
 import com.codeit.findex.domain.indexdata.entity.SourceType;
 import com.codeit.findex.domain.indexdata.mapper.IndexDataMapper;
 import com.codeit.findex.domain.indexdata.repository.IndexDataRepository;
-import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
-import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -28,25 +25,13 @@ public class IndexDataService {
 
     private final IndexDataRepository indexDataRepository;
     private final IndexDataMapper mapper;
-    private final IndexInfoRepository indexInfoRepository;
 
     @Transactional
-    public IndexDataDto create(IndexDataCreateRequest request, SourceType sourceType) {
-
-        IndexInfo indexInfo = indexInfoRepository.findById(request.indexInfoId())
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 IndexInfo입니다."));
-
-        IndexData indexData = mapper.toIndexData(request);
-
-        indexData.setIndexInfo(indexInfo);
+    public IndexDataDto create(IndexDataCreateRequest newIndexData, SourceType sourceType) {
+        IndexData indexData = mapper.toIndexData(newIndexData);
         indexData.setSourceType(sourceType);
-
-        System.out.println(indexData.getIndexInfo());
-        System.out.println(indexData.getIndexInfoId());
-
-        IndexData saved = indexDataRepository.save(indexData);
-
-        return mapper.toDto(saved);
+        indexData = indexDataRepository.save(indexData);
+        return mapper.toDto(indexData);
     }
 
     @Transactional
@@ -75,27 +60,27 @@ public class IndexDataService {
     }
 
     @Transactional(readOnly = true)
-    public CursorPageResponseIndexDataDto<IndexDataDto> getIndexDataList(
+    public CursorPageResponseIndexDataDto getIndexDataList(
             IndexDataSearchRequest searchRequest
     ) {
         Slice<IndexData> sliceResult = indexDataRepository.findListByFilterAndCursor(searchRequest);
         List<IndexDataDto> convertedContent = sliceResult.map(mapper::toDto).getContent();
 
         String nextCursor = null;
-        UUID nextIdAfter = null;
+        UUID nextIdAfterUuid = null;
 
         if (sliceResult.hasNext() && !convertedContent.isEmpty()) {
             IndexDataDto lastItem = convertedContent.get(convertedContent.size() - 1);
-            nextCursor = lastItem.getCursorValueByField(searchRequest.sortField() == null ? "baseDate":searchRequest.sortField());
-            nextIdAfter = lastItem.id() != null ? lastItem.id() : null;
+            nextCursor = lastItem.getCursorValueByField(searchRequest.sortField());
+            nextIdAfterUuid = lastItem.id() != null ? lastItem.id() : null;
         }
 
         Integer totalCount = indexDataRepository.countByFilter(searchRequest);
 
-        return new CursorPageResponseIndexDataDto<>(
+        return new CursorPageResponseIndexDataDto(
                 convertedContent,
                 nextCursor,
-                nextIdAfter,
+                nextIdAfterUuid,
                 sliceResult.getSize(),
                 totalCount,
                 sliceResult.hasNext()
@@ -157,3 +142,4 @@ public class IndexDataService {
     }
 
 }
+
