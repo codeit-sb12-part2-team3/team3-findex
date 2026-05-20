@@ -23,92 +23,45 @@ public class SyncJobController {
 
     @GetMapping
     public Slice<SyncJobListResponse> getSyncJobList(
+            @RequestParam(required = false) String jobType,
+            @RequestParam(required = false) UUID indexId,
             @RequestParam(required = false)
-            String jobType,
-
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate,
+            @RequestParam(required = false) String worker,
+            @RequestParam(required = false) String result,
             @RequestParam(required = false)
-            UUID indexId,
-
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobTimeFrom,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate targetDate,
-
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobTimeTo,
             @RequestParam(required = false)
-            String worker,
-
-            @RequestParam(required = false)
-            String result,
-
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime jobTimeFrom,
-
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime jobTimeTo,
-
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime lastJobTime,
-
-            @RequestParam(required = false)
-            UUID lastId,
-
-            @RequestParam(defaultValue = "10")
-            int size
-
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastJobTime,
+            @RequestParam(required = false) UUID lastId,
+            @RequestParam(defaultValue = "10") int size
     ) {
-
         SyncJobSearchCondition condition = new SyncJobSearchCondition(
-                jobType,
-                indexId,
-                targetDate,
-                worker,
-                result,
-                jobTimeFrom,
-                jobTimeTo
+                jobType, indexId, targetDate, worker, result, jobTimeFrom, jobTimeTo
         );
-
-        return syncJobService.getSyncJobList(
-                condition,
-                lastJobTime,
-                lastId,
-                size
-        );
-
+        return syncJobService.getSyncJobList(condition, lastJobTime, lastId, size);
     }
 
-    @PostMapping("/index-info")
+    @PostMapping("/index-infos")
     public List<SyncJobListResponse> syncIndexInfo(
-            @RequestParam List<String> indexNames,
             HttpServletRequest request
     ) {
         String workerIp = request.getRemoteAddr();
-
-        return syncJobService.syncIndexInfo(indexNames, workerIp);
+        return syncJobService.syncIndexInfo(workerIp);
     }
 
     @PostMapping("/index-data")
     public List<SyncJobListResponse> syncIndexData(
             @RequestParam(required = false) UUID indexId,
-
             @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate,
-
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate endDate,
-
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             HttpServletRequest request
     ) {
         String workerIp = request.getRemoteAddr();
-
-        return syncJobService.syncIndexData(
-                indexId,
-                startDate,
-                endDate,
-                workerIp
-        );
+        return syncJobService.syncIndexData(indexId, startDate, endDate, workerIp);
     }
 }
