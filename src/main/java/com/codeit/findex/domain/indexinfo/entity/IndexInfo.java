@@ -55,7 +55,7 @@ public class IndexInfo {
     public void update(String indexClassification, Integer employedItemsCount) {
         this.indexClassification = indexClassification;
         this.employedItemsCount = employedItemsCount;
-    }
+        }
 
     public void update(
 
