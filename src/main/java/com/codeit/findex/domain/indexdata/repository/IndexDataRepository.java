@@ -16,4 +16,6 @@ import java.util.UUID;
 public interface IndexDataRepository extends JpaRepository<IndexData, UUID>, IndexDataRepositoryCustom {
 
     List<IndexData> findByIndexInfoIdAndBaseDateBetweenOrderByFluctuationRateDesc(UUID indexInfoId, LocalDate baseDateAfter, LocalDate baseDateBefore, Limit limit);
+
+    List<IndexData> findByBaseDateBetweenOrderByFluctuationRateDesc(LocalDate baseDateAfter, LocalDate baseDateBefore, Limit limit);
 }

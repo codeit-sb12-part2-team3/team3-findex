@@ -6,6 +6,8 @@ import com.codeit.findex.domain.indexdata.entity.PeriodType;
 import com.codeit.findex.domain.indexdata.entity.SourceType;
 import com.codeit.findex.domain.indexdata.mapper.IndexDataMapper;
 import com.codeit.findex.domain.indexdata.repository.IndexDataRepository;
+import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
+import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Limit;
@@ -25,14 +27,25 @@ public class IndexDataService {
 
     private final IndexDataRepository indexDataRepository;
     private final IndexDataMapper mapper;
+    private final IndexInfoRepository indexInfoRepository;
 
     @Transactional
-    public IndexDataDto create(IndexDataCreateRequest newIndexData, SourceType sourceType) {
-        IndexData indexData = mapper.toIndexData(newIndexData);
-        indexData.setSourceType(sourceType);
-        indexData = indexDataRepository.save(indexData);
+    public IndexDataDto create(IndexDataCreateRequest request, SourceType sourceType) {
 
-        return mapper.toDto(indexData);
+        IndexInfo indexInfo = indexInfoRepository.findById(request.indexInfoId())
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 IndexInfo입니다."));
+
+        IndexData indexData = mapper.toIndexData(request);
+
+        indexData.setIndexInfo(indexInfo);
+        indexData.setSourceType(sourceType);
+
+        System.out.println(indexData.getIndexInfo());
+        System.out.println(indexData.getIndexInfoId());
+
+        IndexData saved = indexDataRepository.save(indexData);
+
+        return mapper.toDto(saved);
     }
 
     @Transactional
