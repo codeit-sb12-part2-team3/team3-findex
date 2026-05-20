@@ -87,4 +87,28 @@ public class SyncJobController {
 
         return syncJobService.syncIndexInfo(indexNames, workerIp);
     }
+
+    @PostMapping("/index-data")
+    public List<SyncJobListResponse> syncIndexData(
+            @RequestParam(required = false) UUID indexId,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate,
+
+            HttpServletRequest request
+    ) {
+        String workerIp = request.getRemoteAddr();
+
+        return syncJobService.syncIndexData(
+                indexId,
+                startDate,
+                endDate,
+                workerIp
+        );
+    }
 }
