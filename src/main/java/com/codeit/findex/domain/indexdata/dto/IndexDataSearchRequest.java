@@ -13,7 +13,7 @@ public record IndexDataSearchRequest(
 
         UUID idAfter,
         String cursor,
-        int size
+        Integer size
 ) {
 
 }

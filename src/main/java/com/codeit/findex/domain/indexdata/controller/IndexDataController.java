@@ -45,7 +45,7 @@ public class IndexDataController {
 
     @GetMapping
     public ResponseEntity<CursorPageResponseIndexDataDto<IndexDataDto>> searchIndexData(
-            @RequestBody IndexDataSearchRequest searchRequest) {
+            @ModelAttribute IndexDataSearchRequest searchRequest) {
         CursorPageResponseIndexDataDto<IndexDataDto> result = indexDataService.getIndexDataList(searchRequest);
         return ResponseEntity.ok(result);
     }
