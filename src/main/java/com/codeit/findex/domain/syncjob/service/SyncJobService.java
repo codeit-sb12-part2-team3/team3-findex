@@ -8,7 +8,7 @@ import com.codeit.findex.domain.syncjob.entity.SyncJob;
 import com.codeit.findex.domain.syncjob.repository.SyncJobRepository;
 import com.codeit.findex.domain.syncjob.specification.SyncJobSpecification;
 import com.codeit.findex.infra.openapi.OpenApiClient;
-import com.codeit.findex.infra.openapi.OpenApiResponseDto;
+import com.codeit.findex.infra.openapi.dto.OpenApiResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
