@@ -5,11 +5,16 @@ import com.codeit.findex.domain.indexdata.entity.PeriodType;
 import com.codeit.findex.domain.indexdata.entity.SourceType;
 import com.codeit.findex.domain.indexdata.service.IndexDataService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.time.Period;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -59,5 +64,24 @@ public class IndexDataController {
         PeriodType periodType = PeriodType.fromString(period);
         List<RankedIndexPerformanceDto> response = indexDataService.getRank(indexInfoId,periodType,limit);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/export/csv")
+    public ResponseEntity<StreamingResponseBody> exportCsv(
+            @ModelAttribute IndexDataSearchRequest searchRequest
+    ) {
+        StreamingResponseBody body = outputStream -> {
+            try (PrintWriter writer = new PrintWriter(
+                    new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)
+            )) {
+                writer.write('\uFEFF');
+                indexDataService.exportCsv(searchRequest, writer);
+            }
+        };
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"index-data.csv\"")
+                .body(body);
     }
 }
