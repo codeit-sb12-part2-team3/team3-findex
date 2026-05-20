@@ -1,5 +1,6 @@
 package com.codeit.findex.domain.syncjob.entity;
 
+import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -10,7 +11,7 @@ import java.util.UUID;
 
 
 @Entity
-@Table(name = "sync_job")
+@Table(name = "sync_info")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -21,8 +22,9 @@ public class SyncJob {
     @UuidGenerator
     private UUID id;
 
-    @Column(name = "index_id", nullable = false)
-    private UUID indexId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "index_id", nullable = false)
+    private IndexInfo indexInfo;
 
     @Column(name = "job_type", nullable = false, length = 20)
     private String jobType;
@@ -30,7 +32,7 @@ public class SyncJob {
     @Column(name = "target_date")
     private LocalDate targetDate;
 
-    @Column(name = "worker", nullable = false, length = 20)
+    @Column(name = "worker", nullable = false, length = 45)
     private String worker;
 
     @Column(name = "job_time", nullable = false)

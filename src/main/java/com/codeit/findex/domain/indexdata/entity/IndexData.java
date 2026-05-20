@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
@@ -30,10 +31,24 @@ public class IndexData {
     @Column(updatable = false, nullable = false)
     private UUID id;
 
+//    @Column(name = "index_id", nullable = false)
+//    private UUID indexInfoId;
+    @Column(
+        name = "index_id",
+        nullable = false,
+        insertable = false,
+        updatable = false
+    )
+    private UUID indexInfoId;
     @Column(name = "index_id", nullable = false)
     private UUID indexInfoId;
 
-    @Column(name = "base_date",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "index_id", nullable = false)
+    private IndexInfo indexInfo;
+
+    @Column(name = "base_date",nullable = false,
+    columnDefinition = "기준 일자")
     private LocalDate baseDate;
 
     @Column(name = "source_type", nullable = false)

@@ -3,15 +3,16 @@ spring:
     name: findex
 
   datasource:
-    url: jdbc:postgresql://yamanote.proxy.rlwy.net:44055/railway
-    username: postgres
-    password: BRVEciPtrzlkJIDoasNSiGrUMMWZqHvL
-    driver-class-name: org.postgresql.Driver
+    url:
+    username:
+    password:
+    driver-class-name:
 
   jpa:
     hibernate:
       ddl-auto: none
     show-sql: true
 
-openapi:
+open-api:
   service-key:
+  base-url: https://apis.data.go.kr/1160100/service/GetMarketIndexInfoService
