@@ -2,7 +2,7 @@
 --  index_info (지수 정보)
 -- ================================
 CREATE TABLE IF NOT EXISTS index_info (
-                                          id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
 
     index_name VARCHAR(100) NOT NULL,
     index_classification VARCHAR(50) NOT NULL,
@@ -29,7 +29,7 @@ CREATE INDEX IF NOT EXISTS idx_index_info_favorite
 --  index_data (지수 데이터)
 -- ================================
 CREATE TABLE IF NOT EXISTS index_data (
-                                          id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
 
     index_id UUID NOT NULL,
 
@@ -67,7 +67,7 @@ CREATE INDEX IF NOT EXISTS idx_index_data_lookup
 --  auto_sync
 -- ================================
 CREATE TABLE IF NOT EXISTS auto_sync (
-                                         id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+   id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
 
     index_id UUID NOT NULL UNIQUE,
     enabled BOOLEAN NOT NULL DEFAULT FALSE,
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS auto_sync (
 --  sync_info (동기화 기록)
 -- ================================
 CREATE TABLE IF NOT EXISTS sync_info (
-                                         id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
 
     index_id UUID NOT NULL,
     job_type VARCHAR(20),
