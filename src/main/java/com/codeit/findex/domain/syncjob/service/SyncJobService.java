@@ -11,6 +11,7 @@ import com.codeit.findex.domain.syncjob.specification.SyncJobSpecification;
 import com.codeit.findex.infra.openapi.OpenApiClient;
 import com.codeit.findex.infra.openapi.OpenApiService;
 import com.codeit.findex.infra.openapi.dto.OpenApiIndexItemDto;
+import com.codeit.findex.infra.openapi.dto.OpenApiResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

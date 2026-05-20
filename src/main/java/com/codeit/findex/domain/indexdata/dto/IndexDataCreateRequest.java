@@ -1,17 +1,13 @@
 package com.codeit.findex.domain.indexdata.dto;
 
-import com.codeit.findex.domain.indexdata.entity.SourceType;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
 public record IndexDataCreateRequest(
-        UUID indexId,
+        UUID indexInfoId,
 
         LocalDate baseDate,
-
-        SourceType sourceType,
 
         BigDecimal marketPrice,
 
@@ -25,9 +21,9 @@ public record IndexDataCreateRequest(
 
         BigDecimal fluctuationRate,
 
-        Long tradeQuantity,
+        Long tradingQuantity,
 
-        Long tradePrice,
+        Long tradingPrice,
 
         Long marketTotalAmount
 ) {

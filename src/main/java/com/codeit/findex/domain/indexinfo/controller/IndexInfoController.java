@@ -4,6 +4,7 @@ import com.codeit.findex.domain.indexinfo.dto.IndexInfoCreateRequest;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoResponse;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoUpdateRequest;
 import com.codeit.findex.domain.indexinfo.service.IndexInfoService;
+import com.codeit.findex.global.common.dto.CursorPageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,10 +33,16 @@ public class IndexInfoController {
 
     // 지수 정보 목록 조회 API
     @GetMapping
-    public ResponseEntity<List<IndexInfoResponse>> findAll() {
+    public ResponseEntity<CursorPageResponse<IndexInfoResponse>> findAll() {
         return ResponseEntity.ok(
                 indexInfoService.findAll()
         );
+    }
+
+    @GetMapping("/summaries")
+
+    public ResponseEntity<List<IndexInfoResponse>> getSummaries() {
+        return ResponseEntity.ok(indexInfoService.getSummaries());
     }
 
     // 지수 정보 단건 조회 API

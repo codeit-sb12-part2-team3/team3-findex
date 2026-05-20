@@ -1,12 +1,8 @@
 package com.codeit.findex.domain.indexdata.dto;
 
-import com.codeit.findex.domain.indexdata.entity.SourceType;
-
 import java.math.BigDecimal;
 
 public record IndexDataUpdateRequest (
-
-        SourceType sourceType,
 
         BigDecimal marketPrice,
 
@@ -20,9 +16,9 @@ public record IndexDataUpdateRequest (
 
         BigDecimal fluctuationRate,
 
-        Long tradeQuantity,
+        Long tradingQuantity,
 
-        Long tradePrice,
+        Long tradingPrice,
 
         Long marketTotalAmount
 ) {
