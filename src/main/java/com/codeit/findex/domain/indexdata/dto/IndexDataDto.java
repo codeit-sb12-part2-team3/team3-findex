@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public record IndexDataResponse (
+public record IndexDataDto (
         UUID id,
         UUID indexInfoId,
         LocalDate baseDate,
