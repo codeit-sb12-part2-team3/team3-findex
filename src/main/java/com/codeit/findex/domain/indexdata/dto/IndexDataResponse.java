@@ -29,15 +29,15 @@ public record IndexDataResponse (
         }
 
         return switch (sortField) {
-            case "marketPrice" -> String.valueOf(this.marketPrice);
-            case "closingPrice" -> String.valueOf(this.closingPrice);
-            case "highPrice" -> String.valueOf(this.highPrice);
-            case "lowPrice" -> String.valueOf(this.lowPrice);
-            case "versus" -> String.valueOf(this.versus);
-            case "fluctuationRate" -> String.valueOf(this.fluctuationRate);
-            case "tradingQuantity" -> String.valueOf(this.tradingQuantity);
-            case "tradingPrice" -> String.valueOf(this.tradingPrice);
-            case "marketTotalAmount" -> String.valueOf(this.marketTotalAmount);
+            case "marketPrice" -> this.marketPrice!=null ? String.valueOf(this.marketPrice):null;
+            case "closingPrice" -> this.marketPrice!=null ? String.valueOf(this.closingPrice):null;
+            case "highPrice" -> this.marketPrice!=null ? String.valueOf(this.highPrice):null;
+            case "lowPrice" -> this.marketPrice!=null ? String.valueOf(this.lowPrice):null;
+            case "versus" -> this.marketPrice!=null ? String.valueOf(this.versus):null;
+            case "fluctuationRate" -> this.marketPrice!=null ? String.valueOf(this.fluctuationRate):null;
+            case "tradingQuantity" -> this.marketPrice!=null ? String.valueOf(this.tradingQuantity):null;
+            case "tradingPrice" -> this.marketPrice!=null ? String.valueOf(this.tradingPrice):null;
+            case "marketTotalAmount" -> this.marketPrice!=null ? String.valueOf(this.marketTotalAmount):null;
             default -> this.baseDate != null ? this.baseDate.toString() : null;
         };
     }

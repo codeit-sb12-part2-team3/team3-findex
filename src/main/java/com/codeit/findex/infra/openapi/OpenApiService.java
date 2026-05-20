@@ -73,7 +73,6 @@ public class OpenApiService {
                     new IndexDataCreateRequest(
                             savedInfo.id(),
                             parsedDate,
-                            SourceType.OPEN_API,
                             new BigDecimal(item.getMkp()),
                             new BigDecimal(item.getClpr()),
                             new BigDecimal(item.getHipr()),
@@ -85,7 +84,7 @@ public class OpenApiService {
                             Long.parseLong(item.getLstgMrktTotAmt())
                     );
 
-            indexDataService.create(indexDataCreateRequest);
+            indexDataService.create(indexDataCreateRequest,SourceType.OPEN_API);
         }
 
         return items;

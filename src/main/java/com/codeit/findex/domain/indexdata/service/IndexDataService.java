@@ -2,6 +2,7 @@ package com.codeit.findex.domain.indexdata.service;
 
 import com.codeit.findex.domain.indexdata.dto.*;
 import com.codeit.findex.domain.indexdata.entity.IndexData;
+import com.codeit.findex.domain.indexdata.entity.SourceType;
 import com.codeit.findex.domain.indexdata.mapper.IndexDataMapper;
 import com.codeit.findex.domain.indexdata.repository.IndexDataRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +23,9 @@ public class IndexDataService {
     private final IndexDataMapper mapper;
 
     @Transactional
-    public IndexDataResponse create(IndexDataCreateRequest newIndexData) {
+    public IndexDataResponse create(IndexDataCreateRequest newIndexData, SourceType sourceType) {
         IndexData indexData = mapper.toIndexData(newIndexData);
+        indexData.setSourceType(sourceType);
         indexData = indexDataRepository.save(indexData);
 
         return mapper.toResponse(indexData);
@@ -66,7 +68,7 @@ public class IndexDataService {
 
         if (sliceResult.hasNext() && !convertedContent.isEmpty()) {
             IndexDataResponse lastItem = convertedContent.get(convertedContent.size() - 1);
-            nextCursor = lastItem.getCursorValueByField(searchRequest.sortField());
+            nextCursor = lastItem.getCursorValueByField(searchRequest.sortField() == null ? "baseDate":searchRequest.sortField());
             nextIdAfter = lastItem.id() != null ? lastItem.id().toString() : null;
         }
 

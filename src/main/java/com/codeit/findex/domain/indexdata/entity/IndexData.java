@@ -8,8 +8,8 @@ import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -39,8 +39,6 @@ public class IndexData {
         insertable = false,
         updatable = false
     )
-    private UUID indexInfoId;
-    @Column(name = "index_id", nullable = false)
     private UUID indexInfoId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -84,9 +82,9 @@ public class IndexData {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
-    private Timestamp updatedAt;
+    private LocalDateTime updatedAt;
 }

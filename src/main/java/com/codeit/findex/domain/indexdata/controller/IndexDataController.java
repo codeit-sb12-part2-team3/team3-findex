@@ -1,6 +1,7 @@
 package com.codeit.findex.domain.indexdata.controller;
 
 import com.codeit.findex.domain.indexdata.dto.*;
+import com.codeit.findex.domain.indexdata.entity.SourceType;
 import com.codeit.findex.domain.indexdata.service.IndexDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class IndexDataController {
     @PostMapping
     public ResponseEntity<IndexDataResponse> create(
             @RequestBody IndexDataCreateRequest request) {
-        IndexDataResponse created = indexDataService.create(request);
+        IndexDataResponse created = indexDataService.create(request, SourceType.USER);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
