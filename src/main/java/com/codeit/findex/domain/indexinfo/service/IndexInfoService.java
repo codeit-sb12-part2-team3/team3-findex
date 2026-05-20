@@ -1,5 +1,6 @@
 package com.codeit.findex.domain.indexinfo.service;
 
+import com.codeit.findex.domain.indexdata.entity.SourceType;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoCreateRequest;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoResponse;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoUpdateRequest;
@@ -33,7 +34,7 @@ public class IndexInfoService {
                 .employedItemsCount(request.employedItemsCount())
                 .basePointInTime(request.basePointInTime())
                 .baseIndex(request.baseIndex())
-                .sourceType(request.sourceType())
+                .sourceType(SourceType.USER)
                 .favorite(request.favorite())
                 .build();
 
@@ -113,7 +114,7 @@ public class IndexInfoService {
                 indexInfo.getEmployedItemsCount(),
                 indexInfo.getBasePointInTime(),
                 indexInfo.getBaseIndex(),
-                indexInfo.getSourceType(),
+                indexInfo.getSourceType().name(),
                 indexInfo.getFavorite(),
                 indexInfo.getCreatedAt(),
                 indexInfo.getUpdatedAt()

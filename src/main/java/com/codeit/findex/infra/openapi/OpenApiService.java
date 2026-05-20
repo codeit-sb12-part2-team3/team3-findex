@@ -57,7 +57,6 @@ public class OpenApiService {
                             item.getBasIdx() != null
                                     ? new BigDecimal(item.getBasIdx())
                                     : null,
-                            "OPEN_API",
                             false
                     );
 
