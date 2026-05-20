@@ -8,6 +8,7 @@ import com.codeit.findex.domain.syncjob.entity.SyncJob;
 import com.codeit.findex.domain.syncjob.repository.SyncJobRepository;
 import com.codeit.findex.domain.syncjob.specification.SyncJobSpecification;
 import com.codeit.findex.infra.openapi.OpenApiClient;
+import com.codeit.findex.infra.openapi.dto.OpenApiIndexItemDto;
 import com.codeit.findex.infra.openapi.dto.OpenApiResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +73,7 @@ public class SyncJobService {
                         1
                 );
 
-                OpenApiResponseDto.IndexItem item = response.getResponse()
+                OpenApiIndexItemDto item = response.getResponse()
                         .getBody()
                         .getItems()
                         .getItem()
