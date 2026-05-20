@@ -10,7 +10,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.codeit.findex.domain.indexdata.entity.PeriodType;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
