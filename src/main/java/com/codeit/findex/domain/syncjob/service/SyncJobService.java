@@ -1,6 +1,5 @@
 package com.codeit.findex.domain.syncjob.service;
 
-import com.codeit.findex.domain.indexdata.entity.SourceType;
 import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
 import com.codeit.findex.domain.syncjob.dto.SyncJobListResponse;
@@ -54,7 +53,6 @@ public class SyncJobService {
         List<IndexInfo> allIndexInfos = indexInfoRepository.findAll();
         List<SyncJobListResponse> responses = new ArrayList<>();
 
-        // DB가 비어있으면 전체 지수 가져오기
         if (allIndexInfos.isEmpty()) {
             try {
                 openApiService.syncAndSaveAllIndexInfo();
@@ -69,15 +67,10 @@ public class SyncJobService {
             SyncJob syncJob;
             try {
                 openApiService.syncAndSaveIndexInfo(indexInfo.getIndexName());
-
-                syncJob = createSyncJob(
-                        indexInfo, "지수 정보", null, workerIp, "SUCCESS"
-                );
+                syncJob = createSyncJob(indexInfo, "지수 정보", null, workerIp, "SUCCESS");
             } catch (Exception e) {
                 e.printStackTrace();
-                syncJob = createSyncJob(
-                        indexInfo, "지수 정보", null, workerIp, "FAIL"
-                );
+                syncJob = createSyncJob(indexInfo, "지수 정보", null, workerIp, "FAIL");
             }
             syncJob = syncJobRepository.save(syncJob);
             responses.add(SyncJobListResponse.from(syncJob));
@@ -86,33 +79,30 @@ public class SyncJobService {
     }
 
     public List<SyncJobListResponse> syncIndexData(
-            UUID indexId,
-            LocalDate startDate,
-            LocalDate endDate,
+            List<String> indexInfoIds,
+            LocalDate baseDateFrom,
+            LocalDate baseDateTo,
             String workerIp
     ) {
-        validateDateRange(startDate, endDate);
-        List<IndexInfo> targetIndexInfos = findTargetIndexInfos(indexId);
+        validateDateRange(baseDateFrom, baseDateTo);
+
+        List<IndexInfo> targetIndexInfos = findTargetIndexInfos(indexInfoIds);
         List<SyncJobListResponse> responses = new ArrayList<>();
 
         for (IndexInfo indexInfo : targetIndexInfos) {
-            LocalDate targetDate = startDate;
+            LocalDate targetDate = baseDateFrom;
 
-            while (!targetDate.isAfter(endDate)) {
+            while (!targetDate.isAfter(baseDateTo)) {
                 SyncJob syncJob;
                 try {
                     String baseDate = targetDate.format(DateTimeFormatter.BASIC_ISO_DATE);
                     openApiService.syncAndSaveIndexData(
                             indexInfo.getIndexName(), baseDate, 1, 100
                     );
-                    syncJob = createSyncJob(
-                            indexInfo, "지수 데이터", targetDate, workerIp, "SUCCESS"
-                    );
+                    syncJob = createSyncJob(indexInfo, "지수 데이터", targetDate, workerIp, "SUCCESS");
                 } catch (Exception e) {
                     e.printStackTrace();
-                    syncJob = createSyncJob(
-                            indexInfo, "지수 데이터", targetDate, workerIp, "FAIL"
-                    );
+                    syncJob = createSyncJob(indexInfo, "지수 데이터", targetDate, workerIp, "FAILED");
                 }
                 syncJob = syncJobRepository.save(syncJob);
                 responses.add(SyncJobListResponse.from(syncJob));
@@ -136,13 +126,14 @@ public class SyncJobService {
                 .build();
     }
 
-    private List<IndexInfo> findTargetIndexInfos(UUID indexId) {
-        if (indexId != null) {
-            IndexInfo indexInfo = indexInfoRepository.findById(indexId)
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지수입니다."));
-            return List.of(indexInfo);
+    private List<IndexInfo> findTargetIndexInfos(List<String> indexInfoIds) {
+        if (indexInfoIds == null || indexInfoIds.isEmpty() || indexInfoIds.contains("ALL")) {
+            return indexInfoRepository.findAll();
         }
-        return indexInfoRepository.findAll();
+        return indexInfoIds.stream()
+                .map(id -> indexInfoRepository.findById(UUID.fromString(id))
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지수입니다.")))
+                .toList();
     }
 
     private void validateDateRange(LocalDate startDate, LocalDate endDate) {

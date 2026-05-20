@@ -5,6 +5,10 @@ import com.codeit.findex.domain.indexdata.entity.IndexData;
 import com.codeit.findex.domain.indexdata.entity.SourceType;
 import com.codeit.findex.domain.indexdata.mapper.IndexDataMapper;
 import com.codeit.findex.domain.indexdata.repository.IndexDataRepository;
+import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
+import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
+import com.codeit.findex.global.exception.BusinessException;
+import com.codeit.findex.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -20,10 +24,14 @@ public class IndexDataService {
 
     private final IndexDataRepository indexDataRepository;
     private final IndexDataMapper mapper;
+    private final IndexInfoRepository indexInfoRepository;
 
     @Transactional
     public IndexDataDto create(IndexDataCreateRequest newIndexData, SourceType sourceType) {
         IndexData indexData = mapper.toIndexData(newIndexData);
+        IndexInfo indexInfo = indexInfoRepository.findById(newIndexData.indexInfoId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+        indexData.setIndexInfo(indexInfo);
         indexData.setSourceType(sourceType);
         indexData = indexDataRepository.save(indexData);
         return mapper.toDto(indexData);

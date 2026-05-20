@@ -1,5 +1,6 @@
 package com.codeit.findex.domain.syncjob.controller;
 
+import com.codeit.findex.domain.syncjob.dto.SyncJobIndexDataSyncRequest;
 import com.codeit.findex.domain.syncjob.dto.SyncJobListResponse;
 import com.codeit.findex.domain.syncjob.dto.SyncJobSearchCondition;
 import com.codeit.findex.domain.syncjob.service.SyncJobService;
@@ -28,7 +29,7 @@ public class SyncJobController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate,
             @RequestParam(required = false) String worker,
-            @RequestParam(required = false) String result,
+            @RequestParam(required = false) String status,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobTimeFrom,
             @RequestParam(required = false)
@@ -39,7 +40,7 @@ public class SyncJobController {
             @RequestParam(defaultValue = "10") int size
     ) {
         SyncJobSearchCondition condition = new SyncJobSearchCondition(
-                jobType, indexId, targetDate, worker, result, jobTimeFrom, jobTimeTo
+                jobType, indexId, targetDate, worker, status, jobTimeFrom, jobTimeTo
         );
         return syncJobService.getSyncJobList(condition, lastJobTime, lastId, size);
     }
@@ -54,14 +55,15 @@ public class SyncJobController {
 
     @PostMapping("/index-data")
     public List<SyncJobListResponse> syncIndexData(
-            @RequestParam(required = false) UUID indexId,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestBody SyncJobIndexDataSyncRequest requestDto,
             HttpServletRequest request
     ) {
         String workerIp = request.getRemoteAddr();
-        return syncJobService.syncIndexData(indexId, startDate, endDate, workerIp);
+        return syncJobService.syncIndexData(
+                requestDto.indexInfoIds(),
+                requestDto.baseDateFrom(),
+                requestDto.baseDateTo(),
+                workerIp
+        );
     }
 }
