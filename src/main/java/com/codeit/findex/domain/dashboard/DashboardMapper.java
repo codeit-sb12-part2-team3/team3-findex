@@ -12,7 +12,6 @@ public interface DashboardMapper {
 
     @Mapping(source = "indexInfo.id", target = "indexInfoId")
     @Mapping(source = "indexInfo.indexClassification", target = "indexClassification")
-    @Mapping(source = "indexInfo.indexName", target = "indexName")
     @Mapping(source = "versus", target = "versus")
     @Mapping(source = "fluctuationRate", target = "fluctuationRate")
     @Mapping(source = "closingPrice", target = "currentPrice")

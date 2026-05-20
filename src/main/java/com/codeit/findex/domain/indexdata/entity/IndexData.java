@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -32,14 +33,14 @@ public class IndexData {
     private UUID id;
 
 //    @Column(name = "index_id", nullable = false)
-//    private UUID indexId;
+//    private UUID indexInfoId;
     @Column(
         name = "index_id",
         nullable = false,
         insertable = false,
         updatable = false
     )
-    private UUID indexId;
+    private UUID indexInfoId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "index_id", nullable = false)
@@ -82,9 +83,9 @@ public class IndexData {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
-    private Timestamp updatedAt;
+    private LocalDateTime updatedAt;
 }

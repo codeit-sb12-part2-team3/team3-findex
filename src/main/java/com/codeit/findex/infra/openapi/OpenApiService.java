@@ -83,7 +83,7 @@ public class OpenApiService {
                             Long.parseLong(item.getLstgMrktTotAmt())
                     );
 
-            indexDataService.create(indexDataCreateRequest);
+            indexDataService.create(indexDataCreateRequest,SourceType.OPEN_API);
         }
 
         return items;

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -30,7 +31,9 @@ public class IndexDataRepositoryCustomImpl implements IndexDataRepositoryCustom 
     @Override
     public Slice<IndexData> findListByFilterAndCursor(IndexDataSearchRequest searchRequest) {
 
-        int pageSize = searchRequest.size() > 0 ? searchRequest.size() : 10;
+        int pageSize = Optional.ofNullable(searchRequest.size())
+                .filter(s -> s > 0)
+                .orElse(10);
 
         String sortField = searchRequest.sortField() == null
                 ? "baseDate"
