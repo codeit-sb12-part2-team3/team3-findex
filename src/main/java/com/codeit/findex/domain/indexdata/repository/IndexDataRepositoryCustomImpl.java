@@ -76,7 +76,7 @@ public class IndexDataRepositoryCustomImpl implements IndexDataRepositoryCustom 
     }
 
     private BooleanExpression eqIndexInfoId(UUID indexInfoId) {
-        return indexInfoId != null ? indexData.indexInfoId.eq(indexInfoId) : null;
+        return indexInfoId != null ?  indexData.indexInfo.id.eq(indexInfoId)  : null;
     }
 
     private BooleanExpression betweenBaseDate(LocalDate startDate, LocalDate endDate) {

@@ -12,6 +12,7 @@ import java.util.UUID;
 public class DashboardSummaryResponse {
 
     private UUID indexInfoId;
+    private String indexName;
     private String indexClassification;
 
     private LocalDate baseDate;

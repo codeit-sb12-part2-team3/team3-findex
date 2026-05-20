@@ -1,5 +1,6 @@
 package com.codeit.findex.domain.indexinfo.entity;
 
+import com.codeit.findex.domain.indexdata.entity.SourceType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -37,8 +38,9 @@ public class IndexInfo {
     @Column(name = "base_index", precision = 20, scale = 2)
     private BigDecimal baseIndex;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "source_type", nullable = false, length = 20)
-    private String sourceType;
+    private SourceType sourceType;
 
     @Column(nullable = false)
     private Boolean favorite;
