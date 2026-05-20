@@ -20,7 +20,8 @@ uniqueConstraints = {
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter @Setter
+@EntityListeners(AuditingEntityListener.class)
+@Getter @Setter @ToString
 @Builder
 public class IndexData {
 
@@ -51,40 +52,31 @@ public class IndexData {
     @Enumerated(EnumType.STRING)
     private SourceType sourceType;
 
-    @Column(name = "market_price", nullable = false,
-    columnDefinition = "시가")
+    @Column(name = "market_price", nullable = false)
     private BigDecimal marketPrice;
 
-    @Column(name = "closing_price", nullable = false,
-    columnDefinition = "종가")
+    @Column(name = "closing_price", nullable = false)
     private BigDecimal closingPrice;
 
-    @Column(name = "high_price", nullable = false,
-    columnDefinition = "고가")
+    @Column(name = "high_price", nullable = false)
     private BigDecimal highPrice;
 
-    @Column(name = "low_price", nullable = false,
-            columnDefinition = "저가")
+    @Column(name = "low_price", nullable = false)
     private BigDecimal lowPrice;
 
-    @Column(nullable = false,
-            columnDefinition = "대비")
+    @Column(name = "versus", nullable = false)
     private BigDecimal versus;
 
-    @Column(name = "fluctuation_rate",nullable = false,
-            columnDefinition = "등락율")
+    @Column(name = "fluctuation_rate",nullable = false)
     private BigDecimal fluctuationRate;
 
-    @Column(name = "trade_quantity", nullable = false,
-            columnDefinition = "거래량")
-    private Long tradeQuantity;
+    @Column(name = "trade_quantity", nullable = false)
+    private Long tradingQuantity;
 
-    @Column(name = "trade_price", nullable = false,
-            columnDefinition = "거래 대금")
-    private Long tradePrice;
+    @Column(name = "trade_price", nullable = false)
+    private Long tradingPrice;
 
-    @Column(name = "market_total_amount",nullable = false,
-            columnDefinition = "상장 시가 총액")
+    @Column(name = "market_total_amount",nullable = false)
     private Long marketTotalAmount;
 
     @CreatedDate

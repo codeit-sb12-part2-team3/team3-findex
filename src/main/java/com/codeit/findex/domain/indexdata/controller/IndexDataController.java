@@ -1,8 +1,6 @@
 package com.codeit.findex.domain.indexdata.controller;
 
-import com.codeit.findex.domain.indexdata.dto.IndexDataCreateRequest;
-import com.codeit.findex.domain.indexdata.dto.IndexDataResponse;
-import com.codeit.findex.domain.indexdata.dto.IndexDataUpdateRequest;
+import com.codeit.findex.domain.indexdata.dto.*;
 import com.codeit.findex.domain.indexdata.service.IndexDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,8 +27,22 @@ public class IndexDataController {
     @PatchMapping("/{id}")
     public ResponseEntity<IndexDataResponse> update(
             @PathVariable UUID id,
-            @RequestBody IndexDataUpdateRequest request){
-        IndexDataResponse updated = indexDataService.update(id,request);
+            @RequestBody IndexDataUpdateRequest request) {
+        IndexDataResponse updated = indexDataService.update(id, request);
         return ResponseEntity.status(HttpStatus.OK).body(updated);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable UUID id) {
+        indexDataService.delete(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<IndexDataSearchResponse<IndexDataResponse>> searchIndexData(
+            @RequestBody IndexDataSearchRequest searchRequest) {
+        IndexDataSearchResponse<IndexDataResponse> result = indexDataService.getIndexDataList(searchRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 }

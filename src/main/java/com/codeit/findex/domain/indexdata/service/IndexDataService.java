@@ -1,15 +1,16 @@
 package com.codeit.findex.domain.indexdata.service;
 
-import com.codeit.findex.domain.indexdata.dto.IndexDataCreateRequest;
-import com.codeit.findex.domain.indexdata.dto.IndexDataResponse;
-import com.codeit.findex.domain.indexdata.dto.IndexDataUpdateRequest;
+import com.codeit.findex.domain.indexdata.dto.*;
 import com.codeit.findex.domain.indexdata.entity.IndexData;
+import com.codeit.findex.domain.indexdata.mapper.IndexDataMapper;
 import com.codeit.findex.domain.indexdata.repository.IndexDataRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -18,44 +19,14 @@ import java.util.UUID;
 public class IndexDataService {
 
     private final IndexDataRepository indexDataRepository;
+    private final IndexDataMapper mapper;
 
     @Transactional
     public IndexDataResponse create(IndexDataCreateRequest newIndexData) {
-        IndexData indexData = IndexData.builder()
-                .indexId(newIndexData.indexId())
-                .baseDate(newIndexData.baseDate())
-                .sourceType(newIndexData.sourceType())
-                .marketPrice(newIndexData.marketPrice())
-                .closingPrice(newIndexData.closingPrice())
-                .highPrice(newIndexData.highPrice())
-                .lowPrice(newIndexData.lowPrice())
-                .versus(newIndexData.versus())
-                .fluctuationRate(newIndexData.fluctuationRate())
-                .tradeQuantity(newIndexData.tradeQuantity())
-                .tradePrice(newIndexData.tradePrice())
-                .marketTotalAmount(newIndexData.marketTotalAmount())
-                .build();
+        IndexData indexData = mapper.toIndexData(newIndexData);
         indexData = indexDataRepository.save(indexData);
 
-        return toIndexDataResponse(indexData);
-    }
-
-    private IndexDataResponse toIndexDataResponse(IndexData indexData) {
-        return new IndexDataResponse(
-                indexData.getId(),
-                indexData.getIndexId(),
-                indexData.getBaseDate(),
-                indexData.getSourceType(),
-                indexData.getMarketPrice(),
-                indexData.getClosingPrice(),
-                indexData.getHighPrice(),
-                indexData.getLowPrice(),
-                indexData.getVersus(),
-                indexData.getFluctuationRate(),
-                indexData.getTradeQuantity(),
-                indexData.getTradePrice(),
-                indexData.getMarketTotalAmount()
-        );
+        return mapper.toResponse(indexData);
     }
 
     @Transactional
@@ -63,21 +34,53 @@ public class IndexDataService {
         IndexData indexData = indexDataRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("수정 대상 지수 데이터가 없습니다."));
 
-        if (patch.sourceType() != null) indexData.setSourceType(patch.sourceType());
         if (patch.marketPrice() != null) indexData.setMarketPrice(patch.marketPrice());
         if (patch.closingPrice() != null) indexData.setClosingPrice(patch.closingPrice());
         if (patch.highPrice() != null) indexData.setHighPrice(patch.highPrice());
         if (patch.lowPrice() != null) indexData.setLowPrice(patch.lowPrice());
         if (patch.versus() != null) indexData.setVersus(patch.versus());
         if (patch.fluctuationRate() != null) indexData.setFluctuationRate(patch.fluctuationRate());
-        if (patch.tradeQuantity() != null) indexData.setTradeQuantity(patch.tradeQuantity());
-        if (patch.tradePrice() != null) indexData.setTradePrice(patch.tradePrice());
+        if (patch.tradingQuantity() != null) indexData.setTradingQuantity(patch.tradingQuantity());
+        if (patch.tradingPrice() != null) indexData.setTradingPrice(patch.tradingPrice());
         if (patch.marketTotalAmount() != null) indexData.setMarketTotalAmount(patch.marketTotalAmount());
 
-        return toIndexDataResponse(indexData);
+        return mapper.toResponse(indexData);
     }
 
+    @Transactional
+    public void delete(UUID id) {
+        IndexData indexData = indexDataRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("삭제 대상 지수 데이터가 없습니다."));
+        indexDataRepository.deleteById(indexData.getId());
+    }
 
+    @Transactional(readOnly = true)
+    public IndexDataSearchResponse<IndexDataResponse> getIndexDataList(
+            IndexDataSearchRequest searchRequest
+    ) {
+        Slice<IndexData> sliceResult = indexDataRepository.findListByFilterAndCursor(searchRequest);
+        List<IndexDataResponse> convertedContent = sliceResult.map(mapper::toResponse).getContent();
+
+        String nextCursor = null;
+        String nextIdAfter = null;
+
+        if (sliceResult.hasNext() && !convertedContent.isEmpty()) {
+            IndexDataResponse lastItem = convertedContent.get(convertedContent.size() - 1);
+            nextCursor = lastItem.getCursorValueByField(searchRequest.sortField());
+            nextIdAfter = lastItem.id() != null ? lastItem.id().toString() : null;
+        }
+
+        Integer totalCount = indexDataRepository.countByFilter(searchRequest);
+
+        return new IndexDataSearchResponse<>(
+                convertedContent,
+                nextCursor,
+                nextIdAfter,
+                sliceResult.getSize(),
+                totalCount,
+                sliceResult.hasNext()
+        );
+    }
 
 
 }
