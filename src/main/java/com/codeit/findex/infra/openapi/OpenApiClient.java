@@ -1,5 +1,7 @@
 package com.codeit.findex.infra.openapi;
 
+import com.codeit.findex.global.exception.ErrorCode;
+import com.codeit.findex.global.exception.BusinessException;
 import com.codeit.findex.infra.openapi.config.OpenApiProperties;
 import com.codeit.findex.infra.openapi.dto.OpenApiResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -36,11 +38,11 @@ public class OpenApiClient {
                 .body(OpenApiResponseDto.class);
 
         if (response == null || response.getResponse() == null) {
-            throw new RuntimeException("Open API 응답이 없습니다.");
+            throw new BusinessException(ErrorCode.OPEN_API_NO_RESPONSE);
         }
 
         if (response.getResponse().getHeader() == null) {
-            throw new RuntimeException("Open API 응답 header가 없습니다.");
+            throw new BusinessException(ErrorCode.OPEN_API_INVALID_RESPONSE);
         }
 
         String resultCode = response.getResponse()
@@ -48,10 +50,7 @@ public class OpenApiClient {
                 .getResultCode();
 
         if (!"00".equals(resultCode)) {
-            String resultMsg = response.getResponse()
-                    .getHeader()
-                    .getResultMsg();
-            throw new RuntimeException("Open API 요청 실패: " + resultMsg);
+            throw new BusinessException(ErrorCode.OPEN_API_REQUEST_FAILED);
         }
 
         return response;
