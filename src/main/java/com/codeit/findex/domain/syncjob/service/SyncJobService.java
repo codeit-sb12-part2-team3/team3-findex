@@ -1,5 +1,6 @@
 package com.codeit.findex.domain.syncjob.service;
 
+import com.codeit.findex.domain.indexdata.entity.SourceType;
 import com.codeit.findex.domain.indexdata.repository.IndexDataRepository;
 import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
@@ -96,7 +97,7 @@ public class SyncJobService {
                                 .indexName(item.getIdxNm())
                                 .indexClassification(item.getIdxCsf())
                                 .employedItemsCount(Integer.valueOf(item.getEpyItmsCnt()))
-                                .sourceType("OPEN_API")
+                                .sourceType(SourceType.OPEN_API)
                                 .favorite(false)
                                 .build()
                         );
@@ -124,7 +125,7 @@ public class SyncJobService {
                                 .indexName(indexName)
                                 .indexClassification("UNKNOWN")
                                 .employedItemsCount(0)
-                                .sourceType("OPEN_API")
+                                .sourceType(SourceType.OPEN_API)
                                 .favorite(false)
                                 .build()
                         );

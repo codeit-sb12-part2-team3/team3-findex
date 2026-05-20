@@ -57,7 +57,6 @@ public class OpenApiService {
                             item.getBasIdx() != null
                                     ? new BigDecimal(item.getBasIdx())
                                     : null,
-                            "OPEN_API",
                             false
                     );
 
@@ -73,7 +72,6 @@ public class OpenApiService {
                     new IndexDataCreateRequest(
                             savedInfo.id(),
                             parsedDate,
-                            SourceType.OPEN_API,
                             new BigDecimal(item.getMkp()),
                             new BigDecimal(item.getClpr()),
                             new BigDecimal(item.getHipr()),

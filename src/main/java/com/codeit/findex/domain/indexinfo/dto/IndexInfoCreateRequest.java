@@ -10,7 +10,7 @@ public record IndexInfoCreateRequest(
         Integer employedItemsCount,
         LocalDate basePointInTime,
         BigDecimal baseIndex,
-        String sourceType,
+        //String sourceType,
         Boolean favorite
 ) {
 }
