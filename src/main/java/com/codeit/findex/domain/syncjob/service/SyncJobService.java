@@ -63,6 +63,7 @@ public class SyncJobService {
         }
 
         List<SyncJobListResponse> responses = new ArrayList<>();
+
         for (IndexInfo indexInfo : indexInfos) {
             SyncJob syncJob = syncIndexInfo(indexInfo, workerIp);
             responses.add(SyncJobListResponse.from(syncJob));
@@ -122,14 +123,12 @@ public class SyncJobService {
     ) {
         try {
             String baseDate = targetDate.format(DateTimeFormatter.BASIC_ISO_DATE);
-
             openApiService.syncAndSaveIndexData(
                     indexInfo.getIndexName(),
                     baseDate,
                     1,
                     100
             );
-
             return saveSyncJob(indexInfo, INDEX_DATA_JOB, targetDate, workerIp, SUCCESS);
         } catch (Exception e) {
             e.printStackTrace();
