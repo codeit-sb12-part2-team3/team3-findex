@@ -14,4 +14,24 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, UUID> {
 
     Optional<IndexInfo> findByIndexName(String indexName);
 
+    List<IndexInfo> findByIndexNameIn(List<String> indexNames);
+
+    @Query("""
+        SELECT i FROM IndexInfo i
+        WHERE (:indexClassification IS NULL
+            OR :indexClassification = ''
+            OR i.indexClassification LIKE CONCAT('%', :indexClassification, '%'))
+        AND (:indexName IS NULL
+            OR :indexName = ''
+            OR i.indexName LIKE CONCAT('%', :indexName, '%'))
+        AND (:favorite IS NULL
+            OR i.favorite = :favorite)
+        ORDER BY i.indexClassification ASC
+    """)
+    List<IndexInfo> search(
+            @Param("indexClassification") String indexClassification,
+            @Param("indexName") String indexName,
+            @Param("favorite") Boolean favorite,
+            Pageable pageable
+    );
 }
