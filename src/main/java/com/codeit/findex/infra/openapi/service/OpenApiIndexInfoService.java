@@ -19,9 +19,18 @@ public class OpenApiIndexInfoService {
 
     @Transactional
     public List<IndexInfoResponse> saveAll(List<OpenApiIndexItemDto> items) {
-        return items.stream()
-                .map(this::saveOrUpdate)
+        List<IndexInfoCreateRequest> requests = items.stream()
+                .map(item -> new IndexInfoCreateRequest(
+                        item.getIdxNm(),
+                        item.getIdxCsf(),
+                        toInteger(item.getEpyItmsCnt()),
+                        null,
+                        toBigDecimal(item.getBasIdx()),
+                        false
+                ))
                 .toList();
+
+        return indexInfoService.syncIndexInfos(requests);
     }
 
     public IndexInfoResponse saveOrUpdate(OpenApiIndexItemDto item) {
