@@ -47,9 +47,9 @@ public class SyncJobSpecification {
                 );
             }
 
-            if (condition.result() != null) {
+            if (condition.status() != null) {
                 predicates.add(
-                        cb.equal(root.get("result"), condition.result())
+                        cb.equal(root.get("result"), condition.status())
                 );
             }
 
