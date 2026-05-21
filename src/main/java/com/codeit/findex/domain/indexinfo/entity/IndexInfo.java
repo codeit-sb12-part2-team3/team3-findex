@@ -54,13 +54,14 @@ public class IndexInfo {
     private LocalDateTime updatedAt;
 
 
-    public void update(String indexClassification, Integer employedItemsCount) {
+    public void updateClassification(
+            String indexClassification, Integer employedItemsCount)
+    {
         this.indexClassification = indexClassification;
         this.employedItemsCount = employedItemsCount;
-        }
+    }
 
-    public void update(
-
+    public void updateMarketInfo(
             Integer employedItemsCount,
             LocalDate basePointInTime,
             BigDecimal baseIndex,
