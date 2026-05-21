@@ -1,10 +1,6 @@
 package com.codeit.findex.domain.dashboard.service;
 
-import com.codeit.findex.domain.dashboard.dto.ChartDataPoint;
-import com.codeit.findex.domain.dashboard.dto.IndexChartDto;
-import com.codeit.findex.domain.dashboard.dto.IndexPerformanceDto;
-import com.codeit.findex.domain.dashboard.dto.PeriodType;
-import com.codeit.findex.domain.dashboard.dto.RankedIndexPerformanceDto;
+import com.codeit.findex.domain.dashboard.dto.*;
 import com.codeit.findex.domain.indexdata.entity.IndexData;
 import com.codeit.findex.domain.indexdata.repository.IndexDataRepository;
 import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
@@ -31,19 +27,20 @@ public class DashboardService {
     private final IndexDataRepository indexDataRepository;
     private final IndexInfoRepository indexInfoRepository;
 
+    // 즐겨찾기 요약
     public List<IndexPerformanceDto> getFavoritePerformance(PeriodType periodType) {
-        List<IndexData> latestData = indexDataRepository.findLatestIndexDataWithInfo();
-
-        return latestData.stream()
-                .filter(data -> data.getIndexInfo().getFavorite())
+        List<IndexData> favoriteData = indexDataRepository.findLatestFavoriteIndexData();
+        return favoriteData.stream()
                 .map(this::mapToPerformanceDto)
                 .collect(Collectors.toList());
     }
 
+    // 성과 랭킹
     public List<RankedIndexPerformanceDto> getRankedPerformance(PeriodType periodType) {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = periodType.getStartDate(endDate);
 
+        // 상위 10개 추출
         List<IndexData> topData = indexDataRepository.findTopRankedIndexData(startDate, endDate, PageRequest.of(0, 10));
 
         return IntStream.range(0, topData.size())
@@ -54,6 +51,7 @@ public class DashboardService {
                 .collect(Collectors.toList());
     }
 
+    // 차트 & 이동평균선
     public IndexChartDto getIndexChart(UUID indexInfoId, PeriodType periodType) {
         IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId)
                 .orElseThrow(() -> new IllegalArgumentException("지수 정보가 없습니다."));
@@ -64,7 +62,7 @@ public class DashboardService {
         List<IndexData> dataList = indexDataRepository.findByIndexInfoIdAndBaseDateBetweenOrderByBaseDateAsc(indexInfoId, startDate, endDate);
 
         List<ChartDataPoint> dataPoints = dataList.stream()
-                .map(d -> new ChartDataPoint(d.getBaseDate().toString(), d.getClosingPrice()))
+                .map(d -> new ChartDataPoint(d.getBaseDate(), d.getClosingPrice()))
                 .collect(Collectors.toList());
 
         List<ChartDataPoint> ma5 = calculateMovingAverage(dataPoints, 5);
@@ -81,6 +79,7 @@ public class DashboardService {
                 .build();
     }
 
+    // 매핑
     private IndexPerformanceDto mapToPerformanceDto(IndexData data) {
         return IndexPerformanceDto.builder()
                 .indexInfoId(data.getIndexInfo().getId())
@@ -93,6 +92,7 @@ public class DashboardService {
                 .build();
     }
 
+    // 이동평균선 계산
     private List<ChartDataPoint> calculateMovingAverage(List<ChartDataPoint> points, int days) {
         List<ChartDataPoint> maPoints = new ArrayList<>();
         for (int i = 0; i < points.size(); i++) {
