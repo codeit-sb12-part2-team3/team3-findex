@@ -5,6 +5,7 @@ import com.codeit.findex.domain.indexinfo.dto.IndexInfoResponse;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoUpdateRequest;
 import com.codeit.findex.domain.indexinfo.service.IndexInfoService;
 import com.codeit.findex.global.common.dto.CursorPageResponse;
+import com.codeit.findex.infra.openapi.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ public class IndexInfoController {
 
     // 지수 정보 Service
     private final IndexInfoService indexInfoService;
+    private final OpenApiService openApiService;
 
     // 지수 정보 등록 API
     @PostMapping
@@ -48,6 +50,7 @@ public class IndexInfoController {
     public ResponseEntity<List<IndexInfoResponse>> getSummaries() {
         return ResponseEntity.ok(indexInfoService.getSummaries());
     }
+
 
     // 지수 정보 단건 조회 API
     @GetMapping("/{id}")
