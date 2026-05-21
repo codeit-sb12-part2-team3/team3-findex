@@ -41,3 +41,5 @@ out/
 
 ### Private ###
 application-local.yaml
+
+*.db

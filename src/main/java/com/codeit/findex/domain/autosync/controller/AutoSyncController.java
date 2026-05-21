@@ -1,45 +1,54 @@
 package com.codeit.findex.domain.autosync.controller;
 
-import com.codeit.findex.domain.autosync.dto.AutoSyncCreateRequest;
-import com.codeit.findex.domain.autosync.dto.AutoSyncResponse;
-import com.codeit.findex.domain.autosync.dto.AutoSyncUpdateRequest;
+import com.codeit.findex.domain.autosync.dto.AutoSyncConfigDto;
+import com.codeit.findex.domain.autosync.dto.AutoSyncConfigUpdateRequest;
+import com.codeit.findex.domain.autosync.dto.CursorPageResponseAutoSyncConfigDto;
 import com.codeit.findex.domain.autosync.service.AutoSyncService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/auto-syncs")
+@RequestMapping("/api/auto-sync-configs")
 @RequiredArgsConstructor
 public class AutoSyncController {
 
     private final AutoSyncService autoSyncService;
 
-    @PostMapping
-    public ResponseEntity<AutoSyncResponse> createAutoSync(
-            @Valid @RequestBody AutoSyncCreateRequest request) {
+    /*
+     * 1. 자동 연동 설정 목록 조회
+     * [GET] /api/auto-sync-configs?nextIdAfter={uuid}&indexId={uuid}&enabled={boolean}&sort={string}&size={int}
+     */
+    @GetMapping
+    public ResponseEntity<CursorPageResponseAutoSyncConfigDto> getAutoSyncConfigs(
+            @RequestParam(required = false) UUID nextIdAfter,
+            @RequestParam(required = false) UUID indexId,
+            @RequestParam(required = false) Boolean enabled,
+            @RequestParam(required = false) String sort,
+            @RequestParam(defaultValue = "10") int size) {
 
-        AutoSyncResponse response = autoSyncService.createAutoSync(request);
+        CursorPageResponseAutoSyncConfigDto response =
+                autoSyncService.getAutoSyncConfigs(nextIdAfter, indexId, enabled, sort, size);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @GetMapping("/{indexId}")
-    public ResponseEntity<AutoSyncResponse> getAutoSyncStatus(@PathVariable UUID indexId) {
-        AutoSyncResponse response = autoSyncService.getAutoSyncStatus(indexId);
+        // HTTP 200 OK
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{indexId}")
-    public ResponseEntity<AutoSyncResponse> updateAutoSyncStatus(
-            @PathVariable UUID indexId,
-            @Valid @RequestBody AutoSyncUpdateRequest request) {
+    /*
+     * 2. 자동 연동 설정 수정 (활성화 여부 토글)
+     * [PATCH] /api/auto-sync-configs/{id}
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<AutoSyncConfigDto> updateAutoSyncConfig(
+            @PathVariable UUID id,
+            @Valid @RequestBody AutoSyncConfigUpdateRequest request) {
 
-        AutoSyncResponse response = autoSyncService.updateAutoSyncStatus(indexId, request);
+        AutoSyncConfigDto response = autoSyncService.updateAutoSyncStatus(id, request);
+
+        // HTTP 200 OK
         return ResponseEntity.ok(response);
     }
 }
