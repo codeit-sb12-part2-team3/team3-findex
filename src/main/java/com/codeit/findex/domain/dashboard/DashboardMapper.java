@@ -1,7 +1,7 @@
 package com.codeit.findex.domain.dashboard;
 
-import com.codeit.findex.domain.dashboard.dto.DashboardSummaryResponse;
-import com.codeit.findex.domain.indexdata.entity.IndexData;
+import com.codeit.findex.domain.dashboard.dto.IndexInfoSummaryDto;
+import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -10,13 +10,10 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface DashboardMapper {
 
-    @Mapping(source = "indexInfo.id", target = "indexInfoId")
-    @Mapping(source = "indexInfo.indexClassification", target = "indexClassification")
-    @Mapping(source = "versus", target = "versus")
-    @Mapping(source = "fluctuationRate", target = "fluctuationRate")
-    @Mapping(source = "closingPrice", target = "currentPrice")
-    @Mapping(expression = "java(indexData.getClosingPrice().subtract(indexData.getVersus()))", target = "beforePrice")
-    DashboardSummaryResponse toDto(IndexData indexData);
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "indexClassification", target = "indexClassification")
+    @Mapping(source = "indexName", target = "indexName")
+    IndexInfoSummaryDto toSummaryDto(IndexInfo indexInfo);
 
-    List<DashboardSummaryResponse> toDtoList(List<IndexData> indexDataList);
+    List<IndexInfoSummaryDto> toSummaryDtoList(List<IndexInfo> indexInfoList);
 }
