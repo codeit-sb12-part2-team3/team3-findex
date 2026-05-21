@@ -5,6 +5,8 @@ import com.codeit.findex.domain.indexdata.entity.IndexData;
 import com.codeit.findex.domain.indexdata.repository.IndexDataRepository;
 import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
+import com.codeit.findex.global.exception.BusinessException;
+import com.codeit.findex.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -54,7 +56,7 @@ public class DashboardService {
     // 차트 & 이동평균선
     public IndexChartDto getIndexChart(UUID indexInfoId, PeriodType periodType) {
         IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId)
-                .orElseThrow(() -> new IllegalArgumentException("지수 정보가 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
 
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = periodType.getStartDate(endDate);

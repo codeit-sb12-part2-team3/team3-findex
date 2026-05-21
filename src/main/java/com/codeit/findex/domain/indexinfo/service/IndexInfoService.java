@@ -38,6 +38,10 @@ public class IndexInfoService {
     // 요청 DTO -> Entity 변환
     private IndexInfoResponse create(IndexInfoCreateRequest request, SourceType sourceType) {
 
+        if (indexInfoRepository.existsByIndexName(request.indexName())) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST);
+        }
+
         // null 방지
         LocalDate safeBasePointInTime = request.basePointInTime() != null
                 ? request.basePointInTime()
@@ -93,14 +97,12 @@ public class IndexInfoService {
             String indexName,
             Boolean favorite
     ) {
-        List<IndexInfoResponse> content = indexInfoRepository.findAll()
+        String safeClassification = (indexClassification == null || indexClassification.isBlank()) ? null : indexClassification;
+        String safeName = (indexName == null || indexName.isBlank()) ? null : indexName;
+
+        List<IndexInfoResponse> content = indexInfoRepository
+                .findAllByFilter(safeClassification, safeName, favorite)
                 .stream()
-                .filter(indexInfo -> indexClassification == null || indexClassification.isBlank()
-                        || indexInfo.getIndexClassification().contains(indexClassification))
-                .filter(indexInfo -> indexName == null || indexName.isBlank()
-                        || indexInfo.getIndexName().contains(indexName))
-                .filter(indexInfo -> favorite == null
-                        || indexInfo.getFavorite().equals(favorite))
                 .map(this::toResponse)
                 .toList();
 

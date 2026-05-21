@@ -19,7 +19,6 @@ import com.codeit.findex.domain.indexdata.entity.PeriodType;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -33,13 +32,36 @@ public class IndexDataService {
 
     @Transactional
     public IndexDataDto create(IndexDataCreateRequest newIndexData, SourceType sourceType) {
-        IndexData indexData = mapper.toIndexData(newIndexData);
+        validateFinancialData(newIndexData);
+
+        if (indexDataRepository.existsByIndexInfoIdAndBaseDate(newIndexData.indexInfoId(), newIndexData.baseDate())) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST);
+        }
+
         IndexInfo indexInfo = indexInfoRepository.findById(newIndexData.indexInfoId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+        IndexData indexData = mapper.toIndexData(newIndexData);
         indexData.setIndexInfo(indexInfo);
         indexData.setSourceType(sourceType);
         indexData = indexDataRepository.save(indexData);
         return mapper.toDto(indexData);
+    }
+
+    private void validateFinancialData(IndexDataCreateRequest req) {
+        if (req.baseDate() != null && req.baseDate().isAfter(LocalDate.now())) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST);
+        }
+        java.math.BigDecimal zero = java.math.BigDecimal.ZERO;
+        if (req.closingPrice() != null && req.closingPrice().compareTo(zero) <= 0) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST);
+        }
+        if (req.marketPrice() != null && req.marketPrice().compareTo(zero) <= 0) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST);
+        }
+        if (req.highPrice() != null && req.lowPrice() != null
+                && req.highPrice().compareTo(req.lowPrice()) < 0) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -50,7 +72,7 @@ public class IndexDataService {
     @Transactional
     public IndexDataDto update(UUID id, IndexDataUpdateRequest patch) {
         IndexData indexData = indexDataRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("수정 대상 지수 데이터가 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
 
         if (patch.marketPrice() != null) indexData.setMarketPrice(patch.marketPrice());
         if (patch.closingPrice() != null) indexData.setClosingPrice(patch.closingPrice());
@@ -68,7 +90,7 @@ public class IndexDataService {
     @Transactional
     public void delete(UUID id) {
         IndexData indexData = indexDataRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("삭제 대상 지수 데이터가 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
         indexDataRepository.deleteById(indexData.getId());
     }
 

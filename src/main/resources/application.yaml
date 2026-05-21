@@ -24,6 +24,11 @@ spring:
       schema-locations: classpath:schema-h2.sql
 
 
+
 open-api:
   service-key:
-  base-url: https://apis.data.go.kr/1160100/service/GetMarketIndexInfoService
+  base-url:
+
+scheduler:
+  auto-sync:
+    cron: "0 * * * * *"

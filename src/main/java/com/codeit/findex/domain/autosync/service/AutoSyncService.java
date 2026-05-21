@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -93,29 +92,20 @@ public class AutoSyncService {
 
 
     private void syncAutoSyncDataWithIndexInfo() {
-        // 전체 지수 목록 가져오기
-        List<IndexInfo> allIndexes = indexInfoRepository.findAll();
-        // 현재 생성되어 있는 AutoSync의 지수 ID 목록 가져오기
-        List<UUID> existingAutoSyncIndexIds = autoSyncRepository.findAll().stream()
-                .map(sync -> sync.getIndexInfo().getId())
+        // AutoSync 레코드가 없는 IndexInfo만 DB에서 직접 조회 (O(n²) 인메모리 비교 제거)
+        List<IndexInfo> missing = indexInfoRepository.findIndexInfoWithoutAutoSync();
+
+        if (missing.isEmpty()) {
+            return;
+        }
+
+        List<AutoSync> newAutoSyncs = missing.stream()
+                .map(indexInfo -> AutoSync.builder()
+                        .indexInfo(indexInfo)
+                        .enabled(false)
+                        .build())
                 .collect(Collectors.toList());
 
-        List<AutoSync> newAutoSyncs = new ArrayList<>();
-
-        for (IndexInfo indexInfo : allIndexes) {
-            // 아직 AutoSync 설정이 안 만들어진 지수라면 새로 생성
-            if (!existingAutoSyncIndexIds.contains(indexInfo.getId())) {
-                AutoSync newSync = AutoSync.builder()
-                        .indexInfo(indexInfo)
-                        .enabled(false) // 초기값은 '비활성화'
-                        .build();
-                newAutoSyncs.add(newSync);
-            }
-        }
-
-        // 새로 만들어야 할 설정들이 있다면 한 번에 DB에 저장
-        if (!newAutoSyncs.isEmpty()) {
-            autoSyncRepository.saveAll(newAutoSyncs);
-        }
+        autoSyncRepository.saveAll(newAutoSyncs);
     }
 }
