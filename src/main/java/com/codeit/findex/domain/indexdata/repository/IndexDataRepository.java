@@ -23,22 +23,4 @@ public interface IndexDataRepository extends JpaRepository<IndexData, UUID>, Ind
     List<IndexData> findByBaseDateBetweenOrderByFluctuationRateDesc(LocalDate baseDateAfter, LocalDate baseDateBefore, Limit limit);
 
     boolean existsByIndexInfoIdAndBaseDate(UUID indexInfoId, LocalDate baseDate);
-
-    List<IndexData> findByIndexInfoIdAndBaseDateBetweenOrderByBaseDateAsc(
-            UUID indexInfoId, LocalDate startDate, LocalDate endDate
-    );
-
-    @Query("SELECT d FROM IndexData d JOIN FETCH d.indexInfo i " +
-            "WHERE d.baseDate BETWEEN :startDate AND :endDate " +
-            "ORDER BY d.fluctuationRate DESC")
-    List<IndexData> findTopRankedIndexData(
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate,
-            Pageable pageable
-    );
-
-    @Query("SELECT d FROM IndexData d JOIN FETCH d.indexInfo i " +
-            "WHERE i.favorite = true " +
-            "AND d.baseDate = (SELECT MAX(sub.baseDate) FROM IndexData sub WHERE sub.indexInfo.id = d.indexInfo.id)")
-    List<IndexData> findLatestFavoriteIndexData();
 }
