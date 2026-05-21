@@ -1,5 +1,6 @@
 package com.codeit.findex.domain.syncjob.controller;
 
+import com.codeit.findex.domain.syncjob.controller.api.SyncJobApi;
 import com.codeit.findex.domain.syncjob.dto.CursorPageResponseSyncJobDto;
 import com.codeit.findex.domain.syncjob.dto.SyncJobIndexDataSyncRequest;
 import com.codeit.findex.domain.syncjob.dto.SyncJobDetailResponse;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/sync-jobs")
-public class SyncJobController {
+public class SyncJobController implements SyncJobApi {
 
     private final SyncJobService syncJobService;
 

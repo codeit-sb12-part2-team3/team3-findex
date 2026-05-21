@@ -75,7 +75,7 @@ public class IndexInfoService {
                             ? request.baseIndex()
                             : indexInfo.getBaseIndex();
 
-                    indexInfo.update(
+                    indexInfo.updateMarketInfo(
                             request.employedItemsCount(),
                             indexInfo.getBasePointInTime(),
                             safeBaseIndex,

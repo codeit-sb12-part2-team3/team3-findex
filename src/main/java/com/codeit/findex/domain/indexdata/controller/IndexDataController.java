@@ -1,5 +1,6 @@
 package com.codeit.findex.domain.indexdata.controller;
 
+import com.codeit.findex.domain.indexdata.controller.api.IndexDataApi;
 import com.codeit.findex.domain.indexdata.dto.*;
 import com.codeit.findex.domain.indexdata.entity.SourceType;
 import com.codeit.findex.domain.indexdata.service.IndexDataService;
@@ -23,7 +24,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/index-data")
-public class IndexDataController {
+public class IndexDataController implements IndexDataApi {
 
     private final IndexDataService indexDataService;
 

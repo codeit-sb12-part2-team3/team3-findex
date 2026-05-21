@@ -1,5 +1,6 @@
 package com.codeit.findex.domain.dashboard.controller;
 
+import com.codeit.findex.domain.dashboard.controller.api.DashboardApi;
 import com.codeit.findex.domain.dashboard.dto.IndexChartDto;
 import com.codeit.findex.domain.dashboard.dto.IndexPerformanceDto;
 import com.codeit.findex.domain.dashboard.dto.PeriodType;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/index-data")
 @RequiredArgsConstructor
-public class DashboardController {
+public class DashboardController implements DashboardApi {
 
     private final DashboardService dashboardService;
 
