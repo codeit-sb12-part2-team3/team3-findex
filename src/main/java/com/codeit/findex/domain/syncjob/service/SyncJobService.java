@@ -61,14 +61,12 @@ public class SyncJobService {
         if (indexInfos.isEmpty()) {
             indexInfos = initializeIndexInfos();
         }
-      
-      List<SyncJobListResponse> responses = new ArrayList<>();
+
+        List<SyncJobListResponse> responses = new ArrayList<>();
         for (IndexInfo indexInfo : indexInfos) {
             SyncJob syncJob = syncIndexInfo(indexInfo, workerIp);
             responses.add(SyncJobListResponse.from(syncJob));
         }
-                    responses.add(SyncJobListResponse.from(syncJob));
-                }
 
         return responses;
     }
@@ -88,11 +86,7 @@ public class SyncJobService {
             LocalDate targetDate = baseDateFrom;
 
             while (!targetDate.isAfter(baseDateTo)) {
-              List<SyncJobListResponse> responses = new ArrayList<>();
-        for (IndexInfo indexInfo : indexInfos) {
-            SyncJob syncJob = syncIndexInfo(indexInfo, workerIp);
-            responses.add(SyncJobListResponse.from(syncJob));
-             }
+                SyncJob syncJob = syncIndexData(indexInfo, targetDate, workerIp);
                 responses.add(SyncJobListResponse.from(syncJob));
                 targetDate = targetDate.plusDays(1);
             }

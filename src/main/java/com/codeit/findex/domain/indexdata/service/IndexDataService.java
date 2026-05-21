@@ -105,19 +105,17 @@ public class IndexDataService {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = period.getStartDate(endDate);
 
-        List<IndexPerformanceDto> performance = indexDataRepository.findByIndexInfoIdAndBaseDateBetweenOrderByFluctuationRateDesc(
+        // 💡 중복 선언된 에러 코드 싹 지우고 깔끔하게 정리 완료!
         List<IndexPerformanceDto> performance = indexDataRepository.findByIndexInfoIdAndBaseDateBetweenOrderByFluctuationRateDesc(
                         indexInfoId, startDate, endDate, Limit.of(limit))
-                .stream().map(mapper::toPerformanceDto)
-                .toList();
-                .stream().map(mapper::toPerformanceDto)
+                .stream()
+                .map(mapper::toPerformanceDto)
                 .toList();
 
         return IntStream.range(0, performance.size())
                 .mapToObj(i -> {
                     IndexPerformanceDto p = performance.get(i);
                     int rank = i + 1;
-
                     return new RankedIndexPerformanceDto(p, rank);
                 })
                 .toList();
@@ -156,5 +154,4 @@ public class IndexDataService {
     private String str(Object o) {
         return o == null ? "" : o.toString();
     }
-
 }

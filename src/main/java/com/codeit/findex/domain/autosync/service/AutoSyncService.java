@@ -5,12 +5,15 @@ import com.codeit.findex.domain.autosync.dto.AutoSyncConfigUpdateRequest;
 import com.codeit.findex.domain.autosync.dto.CursorPageResponseAutoSyncConfigDto;
 import com.codeit.findex.domain.autosync.entity.AutoSync;
 import com.codeit.findex.domain.autosync.repository.AutoSyncRepository;
+import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
+import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
 import com.codeit.findex.global.exception.BusinessException;
 import com.codeit.findex.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,13 +25,19 @@ public class AutoSyncService {
 
     private final AutoSyncRepository autoSyncRepository;
 
+    private final IndexInfoRepository indexInfoRepository;
+
     /*
      * 1. 자동 연동 설정 목록 조회 (커서 페이징 + 동적 필터링/정렬 기능 포함)
      */
+    @Transactional
     public CursorPageResponseAutoSyncConfigDto getAutoSyncConfigs(
             UUID nextIdAfter, UUID indexId, Boolean enabled, String sort, int size) {
 
-        // 다음 페이지 유무 확인
+        // 화면에 그리기 전에, 누락된 AutoSync 데이터가 있으면 채워 넣기!
+        syncAutoSyncDataWithIndexInfo();
+
+        // 조회 로직 실행
         List<AutoSync> entities = autoSyncRepository.findListByFilterAndCursor(
                 nextIdAfter, indexId, enabled, sort, size + 1
         );
@@ -80,5 +89,33 @@ public class AutoSyncService {
         autoSync.updateEnabled(request.enabled());
 
         return AutoSyncConfigDto.from(autoSync);
+    }
+
+
+    private void syncAutoSyncDataWithIndexInfo() {
+        // 전체 지수 목록 가져오기
+        List<IndexInfo> allIndexes = indexInfoRepository.findAll();
+        // 현재 생성되어 있는 AutoSync의 지수 ID 목록 가져오기
+        List<UUID> existingAutoSyncIndexIds = autoSyncRepository.findAll().stream()
+                .map(sync -> sync.getIndexInfo().getId())
+                .collect(Collectors.toList());
+
+        List<AutoSync> newAutoSyncs = new ArrayList<>();
+
+        for (IndexInfo indexInfo : allIndexes) {
+            // 아직 AutoSync 설정이 안 만들어진 지수라면 새로 생성
+            if (!existingAutoSyncIndexIds.contains(indexInfo.getId())) {
+                AutoSync newSync = AutoSync.builder()
+                        .indexInfo(indexInfo)
+                        .enabled(false) // 초기값은 '비활성화'
+                        .build();
+                newAutoSyncs.add(newSync);
+            }
+        }
+
+        // 새로 만들어야 할 설정들이 있다면 한 번에 DB에 저장
+        if (!newAutoSyncs.isEmpty()) {
+            autoSyncRepository.saveAll(newAutoSyncs);
+        }
     }
 }
