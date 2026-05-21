@@ -24,23 +24,46 @@ public class IndexInfoService {
     // 지수 정보 저장 Repository
     private final IndexInfoRepository indexInfoRepository;
 
-    // 지수 정보 등록
+    // 사용자 등록 지수 정보
     public IndexInfoResponse create(IndexInfoCreateRequest request) {
+        return create(request, SourceType.USER);
+    }
 
-        // 요청 DTO -> Entity 변환
+    // Open API 동기화 지수 정보
+    public IndexInfoResponse createFromOpenApi(IndexInfoCreateRequest request) {
+        return create(request, SourceType.OPEN_API);
+    }
+
+    // 요청 DTO -> Entity 변환
+    private IndexInfoResponse create(IndexInfoCreateRequest request, SourceType sourceType) {
         IndexInfo indexInfo = IndexInfo.builder()
                 .indexName(request.indexName())
                 .indexClassification(request.indexClassification())
                 .employedItemsCount(request.employedItemsCount())
                 .basePointInTime(request.basePointInTime())
                 .baseIndex(request.baseIndex())
-                .sourceType(SourceType.USER)
+                .sourceType(sourceType)
                 .favorite(request.favorite())
                 .build();
 
         IndexInfo saved = indexInfoRepository.saveAndFlush(indexInfo);
 
         return toResponse(saved);
+    }
+
+    // Open API 지수 정보 동기화
+    public IndexInfoResponse syncIndexInfo(IndexInfoCreateRequest request) {
+        return indexInfoRepository.findByIndexName(request.indexName())
+                .map(indexInfo -> {
+                    indexInfo.update(
+                            request.employedItemsCount(),
+                            indexInfo.getBasePointInTime(),
+                            request.baseIndex(),
+                            indexInfo.getFavorite()
+                    );
+                    return toResponse(indexInfo);
+                })
+                .orElseGet(() -> createFromOpenApi(request));
     }
 
     //  지수 정보 목록 조회

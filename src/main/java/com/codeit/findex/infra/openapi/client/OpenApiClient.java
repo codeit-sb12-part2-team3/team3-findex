@@ -1,4 +1,4 @@
-package com.codeit.findex.infra.openapi;
+package com.codeit.findex.infra.openapi.client;
 
 import com.codeit.findex.global.exception.BusinessException;
 import com.codeit.findex.global.exception.ErrorCode;

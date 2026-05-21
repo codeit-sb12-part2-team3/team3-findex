@@ -7,7 +7,7 @@ import com.codeit.findex.domain.syncjob.dto.SyncJobSearchCondition;
 import com.codeit.findex.domain.syncjob.entity.SyncJob;
 import com.codeit.findex.domain.syncjob.repository.SyncJobRepository;
 import com.codeit.findex.domain.syncjob.specification.SyncJobSpecification;
-import com.codeit.findex.infra.openapi.OpenApiService;
+import com.codeit.findex.infra.openapi.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +27,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SyncJobService {
 
+    private static final String INDEX_INFO_JOB = "지수 정보";
+    private static final String INDEX_DATA_JOB = "지수 데이터";
+    private static final String SUCCESS = "SUCCESS";
+    private static final String FAILED = "FAILED";
+
     private final SyncJobRepository syncJobRepository;
     private final OpenApiService openApiService;
     private final IndexInfoRepository indexInfoRepository;
@@ -45,36 +50,25 @@ public class SyncJobService {
         Specification<SyncJob> spec = SyncJobSpecification
                 .withCondition(condition)
                 .and(SyncJobSpecification.cursor(lastJobTime, lastId));
-        Slice<SyncJob> slice = syncJobRepository.findAll(spec, pageable);
-        return slice.map(SyncJobListResponse::from);
+
+        return syncJobRepository.findAll(spec, pageable)
+                .map(SyncJobListResponse::from);
     }
 
     public List<SyncJobListResponse> syncIndexInfo(String workerIp) {
-        List<IndexInfo> allIndexInfos = indexInfoRepository.findAll();
+        List<IndexInfo> indexInfos = findAllIndexInfos();
+
+        if (indexInfos.isEmpty()) {
+            indexInfos = initializeIndexInfos();
+        }
+
         List<SyncJobListResponse> responses = new ArrayList<>();
 
-        if (allIndexInfos.isEmpty()) {
-            try {
-                openApiService.syncAndSaveAllIndexInfo();
-                allIndexInfos = indexInfoRepository.findAll();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return responses;
-            }
-        }
-
-        for (IndexInfo indexInfo : allIndexInfos) {
-            SyncJob syncJob;
-            try {
-                openApiService.syncAndSaveIndexInfo(indexInfo.getIndexName());
-                syncJob = createSyncJob(indexInfo, "지수 정보", null, workerIp, "SUCCESS");
-            } catch (Exception e) {
-                e.printStackTrace();
-                syncJob = createSyncJob(indexInfo, "지수 정보", null, workerIp, "FAIL");
-            }
-            syncJob = syncJobRepository.save(syncJob);
+        for (IndexInfo indexInfo : indexInfos) {
+            SyncJob syncJob = syncIndexInfo(indexInfo, workerIp);
             responses.add(SyncJobListResponse.from(syncJob));
         }
+
         return responses;
     }
 
@@ -93,30 +87,65 @@ public class SyncJobService {
             LocalDate targetDate = baseDateFrom;
 
             while (!targetDate.isAfter(baseDateTo)) {
-                SyncJob syncJob;
-                try {
-                    String baseDate = targetDate.format(DateTimeFormatter.BASIC_ISO_DATE);
-                    openApiService.syncAndSaveIndexData(
-                            indexInfo.getIndexName(), baseDate, 1, 100
-                    );
-                    syncJob = createSyncJob(indexInfo, "지수 데이터", targetDate, workerIp, "SUCCESS");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    syncJob = createSyncJob(indexInfo, "지수 데이터", targetDate, workerIp, "FAILED");
-                }
-                syncJob = syncJobRepository.save(syncJob);
+                SyncJob syncJob = syncIndexData(indexInfo, targetDate, workerIp);
                 responses.add(SyncJobListResponse.from(syncJob));
                 targetDate = targetDate.plusDays(1);
             }
         }
+
         return responses;
     }
 
-    private SyncJob createSyncJob(
-            IndexInfo indexInfo, String jobType, LocalDate targetDate,
-            String workerIp, String result
+    private List<IndexInfo> initializeIndexInfos() {
+        try {
+            openApiService.syncAndSaveAllIndexInfo();
+            return findAllIndexInfos();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
+
+    private SyncJob syncIndexInfo(IndexInfo indexInfo, String workerIp) {
+        try {
+            openApiService.syncAndSaveIndexInfo(indexInfo.getIndexName());
+            return saveSyncJob(indexInfo, INDEX_INFO_JOB, null, workerIp, SUCCESS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return saveSyncJob(indexInfo, INDEX_INFO_JOB, null, workerIp, FAILED);
+        }
+    }
+
+    private SyncJob syncIndexData(
+            IndexInfo indexInfo,
+            LocalDate targetDate,
+            String workerIp
     ) {
-        return SyncJob.builder()
+        try {
+            String baseDate = targetDate.format(DateTimeFormatter.BASIC_ISO_DATE);
+
+            openApiService.syncAndSaveIndexData(
+                    indexInfo.getIndexName(),
+                    baseDate,
+                    1,
+                    100
+            );
+
+            return saveSyncJob(indexInfo, INDEX_DATA_JOB, targetDate, workerIp, SUCCESS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return saveSyncJob(indexInfo, INDEX_DATA_JOB, targetDate, workerIp, FAILED);
+        }
+    }
+
+    private SyncJob saveSyncJob(
+            IndexInfo indexInfo,
+            String jobType,
+            LocalDate targetDate,
+            String workerIp,
+            String result
+    ) {
+        SyncJob syncJob = SyncJob.builder()
                 .indexInfo(indexInfo)
                 .jobType(jobType)
                 .targetDate(targetDate)
@@ -124,12 +153,19 @@ public class SyncJobService {
                 .jobTime(LocalDateTime.now())
                 .result(result)
                 .build();
+
+        return syncJobRepository.save(syncJob);
+    }
+
+    private List<IndexInfo> findAllIndexInfos() {
+        return indexInfoRepository.findAll();
     }
 
     private List<IndexInfo> findTargetIndexInfos(List<String> indexInfoIds) {
         if (indexInfoIds == null || indexInfoIds.isEmpty() || indexInfoIds.contains("ALL")) {
-            return indexInfoRepository.findAll();
+            return findAllIndexInfos();
         }
+
         return indexInfoIds.stream()
                 .map(id -> indexInfoRepository.findById(UUID.fromString(id))
                         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지수입니다.")))
@@ -140,6 +176,7 @@ public class SyncJobService {
         if (startDate == null || endDate == null) {
             throw new IllegalArgumentException("대상 날짜는 반드시 지정해야 합니다.");
         }
+
         if (startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("시작일은 종료일보다 늦을 수 없습니다.");
         }
