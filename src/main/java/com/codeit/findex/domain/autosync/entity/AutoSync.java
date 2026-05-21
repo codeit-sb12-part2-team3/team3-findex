@@ -2,16 +2,16 @@ package com.codeit.findex.domain.autosync.entity;
 
 import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "auto_sync")
 public class AutoSync {
 

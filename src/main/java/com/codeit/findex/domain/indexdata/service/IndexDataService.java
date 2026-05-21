@@ -115,39 +115,6 @@ public class IndexDataService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public void exportCsv(IndexDataSearchRequest searchRequest, PrintWriter writer) {
-        writer.println("id,indexInfoId,baseDate,sourceType,marketPrice,closingPrice,highPrice,lowPrice,versus,fluctuationRate,tradingQuantity,tradingPrice,marketTotalAmount");
-
-        int totalCount = indexDataRepository.countByFilter(searchRequest);
-
-        // 전체 조회 (페이지네이션 없이)
-        IndexDataSearchRequest fullRequest = new IndexDataSearchRequest(
-                searchRequest.indexInfoId(),
-                searchRequest.startDate(),
-                searchRequest.endDate(),
-                searchRequest.sortField(),
-                searchRequest.sortDirection(),
-                null, null, totalCount
-        );
-
-        indexDataRepository.findListByFilterAndCursor(fullRequest).getContent()
-                .stream()
-                .map(mapper::toDto)
-                .forEach(d -> writer.println(String.join(",",
-                        str(d.id()), str(d.indexInfoId()), str(d.baseDate()),
-                        str(d.sourceType()), str(d.marketPrice()), str(d.closingPrice()),
-                        str(d.highPrice()), str(d.lowPrice()), str(d.versus()),
-                        str(d.fluctuationRate()), str(d.tradingQuantity()),
-                        str(d.tradingPrice()), str(d.marketTotalAmount())
-                )));
-
-        writer.flush();
-    }
-
-    private String str(Object o) {
-        return o == null ? "" : o.toString();
-    }
 
 }
 
