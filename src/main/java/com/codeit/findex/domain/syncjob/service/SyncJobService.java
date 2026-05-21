@@ -67,10 +67,10 @@ public class SyncJobService {
             SyncJob syncJob;
             try {
                 openApiService.syncAndSaveIndexInfo(indexInfo.getIndexName());
-                syncJob = createSyncJob(indexInfo, "지수 정보", null, workerIp, "SUCCESS");
+                syncJob = createSyncJob(indexInfo, "INDEX_INFO", null, workerIp, "SUCCESS");
             } catch (Exception e) {
                 e.printStackTrace();
-                syncJob = createSyncJob(indexInfo, "지수 정보", null, workerIp, "FAIL");
+                syncJob = createSyncJob(indexInfo, "INDEX_INFO", null, workerIp, "FAIL");
             }
             syncJob = syncJobRepository.save(syncJob);
             responses.add(SyncJobListResponse.from(syncJob));
@@ -99,10 +99,10 @@ public class SyncJobService {
                     openApiService.syncAndSaveIndexData(
                             indexInfo.getIndexName(), baseDate, 1, 100
                     );
-                    syncJob = createSyncJob(indexInfo, "지수 데이터", targetDate, workerIp, "SUCCESS");
+                    syncJob = createSyncJob(indexInfo, "INDEX_DATA", targetDate, workerIp, "SUCCESS");
                 } catch (Exception e) {
                     e.printStackTrace();
-                    syncJob = createSyncJob(indexInfo, "지수 데이터", targetDate, workerIp, "FAILED");
+                    syncJob = createSyncJob(indexInfo, "INDEX_DATA", targetDate, workerIp, "FAILED");
                 }
                 syncJob = syncJobRepository.save(syncJob);
                 responses.add(SyncJobListResponse.from(syncJob));
