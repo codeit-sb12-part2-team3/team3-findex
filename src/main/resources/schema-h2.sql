@@ -62,6 +62,16 @@ CREATE TABLE IF NOT EXISTS index_data (
 CREATE INDEX IF NOT EXISTS idx_index_data_lookup
     ON index_data (index_id, base_date DESC);
 
+-- 성능 개선 인덱스
+CREATE INDEX IF NOT EXISTS idx_index_data_perf
+    ON index_data (index_id, base_date, fluctuation_rate DESC);
+
+-- 날짜 기반 조회 최적화
+CREATE INDEX IF NOT EXISTS idx_index_data_date_rate
+    ON index_data (base_date, fluctuation_rate DESC);
+
+
+
 
 -- ================================
 --  auto_sync
@@ -100,5 +110,14 @@ CREATE TABLE IF NOT EXISTS sync_info (
     ON DELETE CASCADE
     );
 
+-- 기존 인덱스
 CREATE INDEX IF NOT EXISTS idx_sync_info_lookup
     ON sync_info (index_id, target_date DESC);
+
+-- 커서 페이징 최적화 (jobTime + id)
+CREATE INDEX IF NOT EXISTS idx_sync_info_jobtime_id
+    ON sync_info (job_time DESC, id DESC);
+
+-- result 조건 + 최신 작업 조회 최적화 인덱스
+CREATE INDEX IF NOT EXISTS idx_sync_info_result_jobtime
+    ON sync_info (result, job_time DESC);

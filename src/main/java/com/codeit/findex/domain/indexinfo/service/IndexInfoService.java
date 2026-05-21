@@ -134,7 +134,7 @@ public class IndexInfoService {
     public IndexInfoResponse update(UUID id, IndexInfoUpdateRequest request) {
         IndexInfo indexInfo = getIndexInfo(id);
 
-        indexInfo.update(
+        indexInfo.updateMarketInfo(
                 request.employedItemsCount(),
                 request.basePointInTime(),
                 request.baseIndex(),
