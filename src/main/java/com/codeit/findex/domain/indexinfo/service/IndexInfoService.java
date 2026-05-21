@@ -55,7 +55,11 @@ public class IndexInfoService {
     public IndexInfoResponse syncIndexInfo(IndexInfoCreateRequest request) {
         return indexInfoRepository.findByIndexName(request.indexName())
                 .map(indexInfo -> {
-                    indexInfo.update(
+                    indexInfo.updateClassification(
+                            request.indexClassification(),
+                            request.employedItemsCount()
+                    );
+                    indexInfo.updateMarketInfo(
                             request.employedItemsCount(),
                             indexInfo.getBasePointInTime(),
                             request.baseIndex(),
@@ -114,7 +118,7 @@ public class IndexInfoService {
 
         IndexInfo indexInfo = getIndexInfo(id);
 
-        indexInfo.update(
+        indexInfo.updateMarketInfo(
                 request.employedItemsCount(),
                 request.basePointInTime(),
                 request.baseIndex(),
