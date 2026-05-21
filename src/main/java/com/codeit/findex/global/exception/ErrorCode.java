@@ -11,7 +11,7 @@ public enum ErrorCode {
 
     INVALID_REQUEST(
             HttpStatus.BAD_REQUEST,
-            "잘못된 요청입니다."
+            "잘못된 매개변수 요청입니다."
     ),
 
     NOT_FOUND(

@@ -12,6 +12,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.net.SocketTimeoutException;
 import java.util.NoSuchElementException;
@@ -28,13 +29,22 @@ public class GlobalRestExceptionHandler {
                 .body(ErrorResponse.of(ErrorCode.INVALID_REQUEST));
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> MethodArgumentTypeMismatch(MethodArgumentTypeMismatchException e) {
+        System.out.println("[BAD REQUEST ERROR] 잘못된 형식의 매개변수 요청: " + e.getMessage());
+
+        return ResponseEntity
+                .badRequest()
+                .body(ErrorResponse.of(ErrorCode.INVALID_REQUEST, "잘못된 형식의 매개변수 요청입니다."));
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> HttpMessageNotReadable(HttpMessageNotReadableException e) {
         System.out.println("[MESSAGE NOT READABLE] 요청 본문 파싱 실패: " + e.getMessage());
 
         return ResponseEntity
                 .badRequest()
-                .body(ErrorResponse.of(ErrorCode.INVALID_REQUEST));
+                .body(ErrorResponse.of(ErrorCode.INVALID_REQUEST, "요청 본문 파싱에 실패하였습니다."));
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -43,7 +53,7 @@ public class GlobalRestExceptionHandler {
 
         return ResponseEntity
                 .badRequest()
-                .body(ErrorResponse.of(ErrorCode.INVALID_REQUEST));
+                .body(ErrorResponse.of(ErrorCode.INVALID_REQUEST,"필수 요청 파라미터가 누락되었습니다."));
     }
 
     @ExceptionHandler(NoSuchElementException.class)
@@ -95,7 +105,7 @@ public class GlobalRestExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> etc(Exception e, WebRequest request) {
-        System.out.println("[Exception] 예기치 못한 오류: " + e.getMessage());
+        System.out.println("[Exception] 예기치 못한 오류: " + e.getClass().getName());
         System.out.println("Request URI: " + request.getDescription(false));
 
         return ResponseEntity
