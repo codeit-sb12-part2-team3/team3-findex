@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public record SyncJobSearchCondition(
         String jobType,
-        UUID indexId,
+        UUID indexInfoId,
         LocalDate targetDate,
         String worker,
         String status,

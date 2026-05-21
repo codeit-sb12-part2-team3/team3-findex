@@ -33,9 +33,13 @@ public class IndexInfoController {
 
     // 지수 정보 목록 조회 API
     @GetMapping
-    public ResponseEntity<CursorPageResponse<IndexInfoResponse>> findAll() {
+    public ResponseEntity<CursorPageResponse<IndexInfoResponse>> findAll(
+            @RequestParam(required = false) String indexClassification,
+            @RequestParam(required = false) String indexName,
+            @RequestParam(required = false) Boolean favorite
+    ) {
         return ResponseEntity.ok(
-                indexInfoService.findAll()
+                indexInfoService.findAll(indexClassification, indexName, favorite)
         );
     }
 
