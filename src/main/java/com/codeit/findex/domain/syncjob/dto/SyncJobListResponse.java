@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record SyncJobListResponse (
         UUID id,
-        UUID indexId,
+        UUID indexInfoId,
         String jobType,
         LocalDate targetDate,
         String worker,
