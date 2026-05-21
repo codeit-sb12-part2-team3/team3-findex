@@ -45,12 +45,13 @@ public class IndexInfoService {
         IndexInfo saved = indexInfoRepository.save(indexInfo);
         return toResponse(saved);
     }
-
     // Open API 지수 정보 동기화
     public IndexInfoResponse syncIndexInfo(IndexInfoCreateRequest request) {
         return indexInfoRepository.findByIndexName(request.indexName())
                 .map(indexInfo -> {
+                    // 업데이트 시에도 기존 값 유지
                     updateExistingIndexInfo(indexInfo, request);
+
                     return toResponse(indexInfo);
                 })
                 .orElseGet(() -> createFromOpenApi(request));
