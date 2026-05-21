@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +23,6 @@ import java.util.UUID;
 @Transactional
 public class IndexInfoService {
 
-    // 지수 정보 저장 Repository
     private final IndexInfoRepository indexInfoRepository;
 
     // 사용자 등록 지수 정보
@@ -36,14 +37,28 @@ public class IndexInfoService {
 
     // 요청 DTO -> Entity 변환
     private IndexInfoResponse create(IndexInfoCreateRequest request, SourceType sourceType) {
+
+        // null 방지
+        LocalDate safeBasePointInTime = request.basePointInTime() != null
+                ? request.basePointInTime()
+                : LocalDate.of(1900, 1, 1); // 임의의 기준일 설정
+
+        BigDecimal safeBaseIndex = request.baseIndex() != null
+                ? request.baseIndex()
+                : new BigDecimal("100.00"); // 임의의 기준 지수 설정
+
+        Boolean safeFavorite = request.favorite() != null
+                ? request.favorite()
+                : false; // 즐겨찾기 기본값
+
         IndexInfo indexInfo = IndexInfo.builder()
                 .indexName(request.indexName())
                 .indexClassification(request.indexClassification())
                 .employedItemsCount(request.employedItemsCount())
-                .basePointInTime(request.basePointInTime())
-                .baseIndex(request.baseIndex())
+                .basePointInTime(safeBasePointInTime) // 안전한 값 대입
+                .baseIndex(safeBaseIndex)             // 안전한 값 대입
                 .sourceType(sourceType)
-                .favorite(request.favorite())
+                .favorite(safeFavorite)               // 안전한 값 대입
                 .build();
 
         IndexInfo saved = indexInfoRepository.saveAndFlush(indexInfo);
@@ -55,10 +70,15 @@ public class IndexInfoService {
     public IndexInfoResponse syncIndexInfo(IndexInfoCreateRequest request) {
         return indexInfoRepository.findByIndexName(request.indexName())
                 .map(indexInfo -> {
+                    // 업데이트 시에도 기존 값 유지
+                    BigDecimal safeBaseIndex = request.baseIndex() != null
+                            ? request.baseIndex()
+                            : indexInfo.getBaseIndex();
+
                     indexInfo.update(
                             request.employedItemsCount(),
                             indexInfo.getBasePointInTime(),
-                            request.baseIndex(),
+                            safeBaseIndex,
                             indexInfo.getFavorite()
                     );
                     return toResponse(indexInfo);
@@ -66,7 +86,7 @@ public class IndexInfoService {
                 .orElseGet(() -> createFromOpenApi(request));
     }
 
-    //  지수 정보 목록 조회
+    // 지수 정보 목록 조회
     @Transactional(readOnly = true)
     public CursorPageResponse<IndexInfoResponse> findAll(
             String indexClassification,
@@ -85,12 +105,12 @@ public class IndexInfoService {
                 .toList();
 
         return new CursorPageResponse<>(
-                content,          // 데이터
-                null,             // nextCursor
-                null,             // nextIdAfter
-                content.size(),   // size
-                content.size(),   // totalElements
-                false             // hasNext
+                content,
+                null,
+                null,
+                content.size(),
+                (long) content.size(),
+                false
         );
     }
 
@@ -102,7 +122,6 @@ public class IndexInfoService {
                 .toList();
     }
 
-
     // 단건 조회
     @Transactional(readOnly = true)
     public IndexInfoResponse findById(UUID id) {
@@ -111,7 +130,6 @@ public class IndexInfoService {
 
     // 수정
     public IndexInfoResponse update(UUID id, IndexInfoUpdateRequest request) {
-
         IndexInfo indexInfo = getIndexInfo(id);
 
         indexInfo.update(
@@ -128,7 +146,7 @@ public class IndexInfoService {
     public void delete(UUID id) {
         getIndexInfo(id);
         indexInfoRepository.deleteById(id);
-        indexInfoRepository.flush();
+        indexInfoRepository.flush(); // 즉시 삭제 반영
     }
 
     // 내부 조회
