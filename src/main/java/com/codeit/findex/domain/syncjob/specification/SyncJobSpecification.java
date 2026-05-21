@@ -12,6 +12,8 @@ import java.util.UUID;
 
 public class SyncJobSpecification {
 
+    private static LocalDateTime lastJobTime;
+
     public static Specification<SyncJob> withCondition(
             SyncJobSearchCondition condition
     ) {
@@ -78,6 +80,7 @@ public class SyncJobSpecification {
     public static Specification<SyncJob> cursor(
             LocalDateTime lastJobTime, UUID lastId
     ) {
+        SyncJobSpecification.lastJobTime = lastJobTime;
         return (root, query, cb) -> {
 
             if (lastJobTime == null || lastId == null) {
