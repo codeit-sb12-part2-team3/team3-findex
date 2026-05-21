@@ -43,6 +43,11 @@ public enum ErrorCode {
     OPEN_API_PARSE_FAILED(
             HttpStatus.INTERNAL_SERVER_ERROR,
             "Open API 응답 파싱에 실패했습니다."
+    ),
+
+    OPEN_API_SAVE_FAILED(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+        "Open API 데이터 저장에 실패했습니다."
     );
 
     private final HttpStatus status;
