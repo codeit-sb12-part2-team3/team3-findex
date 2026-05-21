@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: local
+
   application:
     name: findex
 
@@ -16,7 +19,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
 
   sql:
     init:
@@ -25,5 +34,5 @@ spring:
 
 
 open-api:
-  service-key:
+  service-key: ${OPEN_API_SERVICE_KEY}
   base-url: https://apis.data.go.kr/1160100/service/GetMarketIndexInfoService
