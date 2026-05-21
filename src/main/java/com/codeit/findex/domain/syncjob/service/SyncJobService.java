@@ -2,17 +2,15 @@ package com.codeit.findex.domain.syncjob.service;
 
 import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
-import com.codeit.findex.domain.syncjob.dto.SyncJobListResponse;
+import com.codeit.findex.domain.syncjob.dto.CursorPageResponseSyncJobDto;
+import com.codeit.findex.domain.syncjob.dto.SyncJobDetailResponse;
 import com.codeit.findex.domain.syncjob.dto.SyncJobSearchCondition;
 import com.codeit.findex.domain.syncjob.entity.SyncJob;
 import com.codeit.findex.domain.syncjob.repository.SyncJobRepository;
 import com.codeit.findex.domain.syncjob.specification.SyncJobSpecification;
 import com.codeit.findex.infra.openapi.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +34,7 @@ public class SyncJobService {
     private final OpenApiService openApiService;
     private final IndexInfoRepository indexInfoRepository;
 
-    public Slice<SyncJobListResponse> getSyncJobList(
+    public CursorPageResponseSyncJobDto getSyncJobList(
             SyncJobSearchCondition condition,
             LocalDateTime lastJobTime,
             UUID lastId,
@@ -63,28 +61,50 @@ public class SyncJobService {
                 .withCondition(condition)
                 .and(SyncJobSpecification.cursor(lastJobTime, lastId));
 
-        return syncJobRepository.findAll(spec, pageable)
-                .map(SyncJobListResponse::from);
+        // Slice -> Page로 변경
+        Page<SyncJob> page = syncJobRepository.findAll(spec, pageable);
+
+        List<SyncJobDetailResponse> content = page.getContent().stream()
+                .map(SyncJobDetailResponse::from)
+                .toList();
+
+        String nextCursor = null;
+        UUID newNextIdAfter = null;
+
+        if (page.hasNext() && !content.isEmpty()) {
+            SyncJobDetailResponse lastItem = content.get(content.size() - 1);
+            nextCursor = lastItem.jobTime() != null ? lastItem.jobTime().toString() : null;
+            newNextIdAfter = lastItem.id();
+        }
+
+        return new CursorPageResponseSyncJobDto(
+                content,
+                nextCursor,
+                newNextIdAfter,
+                content.size(),
+                page.getTotalElements(), // 전체 개수 세팅
+                page.hasNext()
+        );
     }
 
-    public List<SyncJobListResponse> syncIndexInfo(String workerIp) {
+    public List<SyncJobDetailResponse> syncIndexInfo(String workerIp) {
         List<IndexInfo> indexInfos = findAllIndexInfos();
 
         if (indexInfos.isEmpty()) {
             indexInfos = initializeIndexInfos();
         }
 
-        List<SyncJobListResponse> responses = new ArrayList<>();
+        List<SyncJobDetailResponse> responses = new ArrayList<>();
 
         for (IndexInfo indexInfo : indexInfos) {
             SyncJob syncJob = syncIndexInfo(indexInfo, workerIp);
-            responses.add(SyncJobListResponse.from(syncJob));
+            responses.add(SyncJobDetailResponse.from(syncJob));
         }
 
         return responses;
     }
 
-    public List<SyncJobListResponse> syncIndexData(
+    public List<SyncJobDetailResponse> syncIndexData(
             List<String> indexInfoIds,
             LocalDate baseDateFrom,
             LocalDate baseDateTo,
@@ -93,14 +113,14 @@ public class SyncJobService {
         validateDateRange(baseDateFrom, baseDateTo);
 
         List<IndexInfo> targetIndexInfos = findTargetIndexInfos(indexInfoIds);
-        List<SyncJobListResponse> responses = new ArrayList<>();
+        List<SyncJobDetailResponse> responses = new ArrayList<>();
 
         for (IndexInfo indexInfo : targetIndexInfos) {
             LocalDate targetDate = baseDateFrom;
 
             while (!targetDate.isAfter(baseDateTo)) {
                 SyncJob syncJob = syncIndexData(indexInfo, targetDate, workerIp);
-                responses.add(SyncJobListResponse.from(syncJob));
+                responses.add(SyncJobDetailResponse.from(syncJob));
                 targetDate = targetDate.plusDays(1);
             }
         }
