@@ -1,5 +1,6 @@
 package com.codeit.findex.domain.indexinfo.controller;
 
+import com.codeit.findex.domain.indexinfo.controller.api.IndexInfoApi;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoCreateRequest;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoResponse;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoUpdateRequest;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/index-infos")
-public class IndexInfoController {
+public class IndexInfoController implements IndexInfoApi {
 
     // 지수 정보 Service
     private final IndexInfoService indexInfoService;

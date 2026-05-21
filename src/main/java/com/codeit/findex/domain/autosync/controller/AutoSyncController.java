@@ -1,5 +1,6 @@
 package com.codeit.findex.domain.autosync.controller;
 
+import com.codeit.findex.domain.autosync.controller.api.AutoSyncApi;
 import com.codeit.findex.domain.autosync.dto.AutoSyncConfigDto;
 import com.codeit.findex.domain.autosync.dto.AutoSyncConfigUpdateRequest;
 import com.codeit.findex.domain.autosync.dto.CursorPageResponseAutoSyncConfigDto;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/auto-sync-configs")
 @RequiredArgsConstructor
-public class AutoSyncController {
+public class AutoSyncController implements AutoSyncApi {
 
     private final AutoSyncService autoSyncService;
 
