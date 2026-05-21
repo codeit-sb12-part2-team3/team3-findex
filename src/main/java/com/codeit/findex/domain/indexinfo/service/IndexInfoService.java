@@ -68,10 +68,19 @@ public class IndexInfoService {
 
     //  지수 정보 목록 조회
     @Transactional(readOnly = true)
-    public CursorPageResponse<IndexInfoResponse> findAll() {
-
+    public CursorPageResponse<IndexInfoResponse> findAll(
+            String indexClassification,
+            String indexName,
+            Boolean favorite
+    ) {
         List<IndexInfoResponse> content = indexInfoRepository.findAll()
                 .stream()
+                .filter(indexInfo -> indexClassification == null || indexClassification.isBlank()
+                        || indexInfo.getIndexClassification().contains(indexClassification))
+                .filter(indexInfo -> indexName == null || indexName.isBlank()
+                        || indexInfo.getIndexName().contains(indexName))
+                .filter(indexInfo -> favorite == null
+                        || indexInfo.getFavorite().equals(favorite))
                 .map(this::toResponse)
                 .toList();
 

@@ -40,11 +40,23 @@ public class SyncJobService {
             SyncJobSearchCondition condition,
             LocalDateTime lastJobTime,
             UUID lastId,
+            String sortField,
+            String sortDirection,
             int size
     ) {
+        String safeSortField = switch (sortField) {
+            case "targetDate" -> "targetDate";
+            case "jobTime" -> "jobTime";
+            default -> "jobTime";
+        };
+
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortDirection)
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+
         Sort sort = Sort.by(
-                Sort.Order.desc("jobTime"),
-                Sort.Order.desc("id")
+                new Sort.Order(direction, safeSortField),
+                new Sort.Order(direction, "id")
         );
         Pageable pageable = PageRequest.of(0, size, sort);
         Specification<SyncJob> spec = SyncJobSpecification

@@ -25,7 +25,7 @@ public class SyncJobController {
     @GetMapping
     public Slice<SyncJobListResponse> getSyncJobList(
             @RequestParam(required = false) String jobType,
-            @RequestParam(required = false) UUID indexId,
+            @RequestParam(name = "indexInfoId", required = false) UUID indexId,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate,
             @RequestParam(required = false) String worker,
@@ -37,12 +37,17 @@ public class SyncJobController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastJobTime,
             @RequestParam(required = false) UUID lastId,
+            @RequestParam(required = false, defaultValue = "jobTime") String sortField,
+            @RequestParam(required = false, defaultValue = "desc") String sortDirection,
             @RequestParam(defaultValue = "10") int size
     ) {
         SyncJobSearchCondition condition = new SyncJobSearchCondition(
                 jobType, indexId, targetDate, worker, status, jobTimeFrom, jobTimeTo
         );
-        return syncJobService.getSyncJobList(condition, lastJobTime, lastId, size);
+        return syncJobService.getSyncJobList(
+                condition, lastJobTime, lastId, sortField,
+                sortDirection, size
+        );
     }
 
     @PostMapping("/index-infos")
