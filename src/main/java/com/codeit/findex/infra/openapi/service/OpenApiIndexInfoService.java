@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Service
@@ -24,7 +27,7 @@ public class OpenApiIndexInfoService {
                         item.getIdxNm(),
                         item.getIdxCsf(),
                         toInteger(item.getEpyItmsCnt()),
-                        null,
+                        parseBasePointInTime(item.getBasPntm()),
                         toBigDecimal(item.getBasIdx()),
                         false
                 ))
@@ -38,7 +41,7 @@ public class OpenApiIndexInfoService {
                 item.getIdxNm(),
                 item.getIdxCsf(),
                 toInteger(item.getEpyItmsCnt()),
-                null,
+                parseBasePointInTime(item.getBasPntm()),
                 toBigDecimal(item.getBasIdx()),
                 false
         );
@@ -51,5 +54,21 @@ public class OpenApiIndexInfoService {
 
     private BigDecimal toBigDecimal(String value) {
         return value == null ? null : new BigDecimal(value);
+    }
+
+    // basPntm 포맷: "YYYY.MM.DD" 또는 "YYYYMMDD"
+    private LocalDate parseBasePointInTime(String basPntm) {
+        if (basPntm == null || basPntm.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(basPntm, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        } catch (DateTimeParseException e1) {
+            try {
+                return LocalDate.parse(basPntm, DateTimeFormatter.BASIC_ISO_DATE);
+            } catch (DateTimeParseException e2) {
+                return null;
+            }
+        }
     }
 }

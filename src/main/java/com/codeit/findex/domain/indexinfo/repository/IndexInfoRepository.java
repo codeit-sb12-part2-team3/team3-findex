@@ -34,4 +34,12 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, UUID> {
             @Param("favorite") Boolean favorite,
             Pageable pageable
     );
+
+    // AutoSync 레코드가 없는 IndexInfo만 반환 (누락된 AutoSync 동기화용)
+    @Query("""
+        SELECT i FROM IndexInfo i 
+                WHERE i.id 
+                        NOT IN (SELECT a.indexInfo.id FROM AutoSync a)
+    """)
+    List<IndexInfo> findIndexInfoWithoutAutoSync();
 }

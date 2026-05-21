@@ -28,8 +28,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SyncJobService {
 
-    private static final String INDEX_INFO_JOB = "지수 정보";
-    private static final String INDEX_DATA_JOB = "지수 데이터";
+    private static final String INDEX_INFO_JOB = "INDEX_INFO";
+    private static final String INDEX_DATA_JOB = "INDEX_DATA";
     private static final String SUCCESS = "SUCCESS";
     private static final String FAILED = "FAILED";
 

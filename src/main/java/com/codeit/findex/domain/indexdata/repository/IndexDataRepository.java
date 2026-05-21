@@ -28,8 +28,15 @@ public interface IndexDataRepository extends JpaRepository<IndexData, UUID>, Ind
             UUID indexInfoId, LocalDate startDate, LocalDate endDate
     );
 
-    @Query("SELECT d FROM IndexData d JOIN FETCH d.indexInfo i " +
+    // 기간 내 지수별 최신 데이터 1건씩 추출 후 등락률 기준 상위 N개 반환
+    // 서브쿼리로 각 지수의 MAX(baseDate)만 선택해 중복 지수 등장을 방지
+    @Query("SELECT d FROM IndexData d JOIN FETCH d.indexInfo " +
             "WHERE d.baseDate BETWEEN :startDate AND :endDate " +
+            "AND d.baseDate = (" +
+            "  SELECT MAX(sub.baseDate) FROM IndexData sub " +
+            "  WHERE sub.indexInfo.id = d.indexInfo.id " +
+            "  AND sub.baseDate BETWEEN :startDate AND :endDate" +
+            ") " +
             "ORDER BY d.fluctuationRate DESC")
     List<IndexData> findTopRankedIndexData(
             @Param("startDate") LocalDate startDate,
@@ -41,4 +48,8 @@ public interface IndexDataRepository extends JpaRepository<IndexData, UUID>, Ind
             "WHERE i.favorite = true " +
             "AND d.baseDate = (SELECT MAX(sub.baseDate) FROM IndexData sub WHERE sub.indexInfo.id = d.indexInfo.id)")
     List<IndexData> findLatestFavoriteIndexData();
+
+    // 스케줄러용: 특정 지수의 가장 최신 기준일 조회
+    @Query("SELECT MAX(d.baseDate) FROM IndexData d WHERE d.indexInfo.id = :indexInfoId")
+    LocalDate findMaxBaseDateByIndexInfoId(@Param("indexInfoId") UUID indexInfoId);
 }
