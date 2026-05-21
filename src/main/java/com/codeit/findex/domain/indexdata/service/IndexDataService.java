@@ -105,20 +105,23 @@ public class IndexDataService {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = period.getStartDate(endDate);
 
-        List<IndexPerformanceDto> performance = indexDataRepository.findByIndexInfoIdAndBaseDateBetweenOrderByFluctuationRateDesc(
-        List<IndexPerformanceDto> performance = indexDataRepository.findByIndexInfoIdAndBaseDateBetweenOrderByFluctuationRateDesc(
-                        indexInfoId, startDate, endDate, Limit.of(limit))
-                .stream().map(mapper::toPerformanceDto)
-                .toList();
-                .stream().map(mapper::toPerformanceDto)
-                .toList();
+        List<IndexPerformanceDto> performance =
+                indexDataRepository.findByIndexInfoIdAndBaseDateBetweenOrderByFluctuationRateDesc(
+                                indexInfoId,
+                                startDate,
+                                endDate,
+                                Limit.of(limit)
+                        )
+                        .stream()
+                        .map(mapper::toPerformanceDto)
+                        .toList();
 
         return IntStream.range(0, performance.size())
                 .mapToObj(i -> {
-                    IndexPerformanceDto p = performance.get(i);
+                    IndexPerformanceDto item = performance.get(i);
                     int rank = i + 1;
 
-                    return new RankedIndexPerformanceDto(p, rank);
+                    return new RankedIndexPerformanceDto(item, rank);
                 })
                 .toList();
     }
