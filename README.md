@@ -1,4 +1,4 @@
-# {팀이름}
+# 파트2_3팀
 https://www.notion.so/Part_Team3-360a0dc3f7b680369764f847a959e9e8?source=copy_link
 
 ## 팀원 구성 
@@ -9,10 +9,9 @@ https://www.notion.so/Part_Team3-360a0dc3f7b680369764f847a959e9e8?source=copy_li
  정우진 : https://github.com/zinzin68  
 
 ## 프로젝트 소개
-- 가볍고 빠른 외부 API 연동 금융 분석 벡엔드 시스템 구축
-- 💹 한눈에 보는 금융 지수 데이터!
-Findex는 외부 Open API와 연동하여 금융 지수 데이터를 제공하는 대시보드 서비스입니다.
-사용자는 직관적인 UI에서 금융 지수의 흐름을 파악하고, 자동 연동 기능을 통해 최신 데이터를 분석할 수 있습니다. 지수별 성과 분석, 이동평균선 계산, 자동 데이터 업데이트 기능을 통해 가볍고 강력한 금융 분석 도구를 경험해 보세요! 📈📊
+- Findex : 외부 Open API와 연동하여 금융 지수 데이터를 제공하는 대시보드 서비스의 백엔드 시스템을 구축하였습니다.
+- 직관적인 UI에서 금융 지수의 흐름을 파악하고, 자동 연동 기능을 통해 최신 데이터를 분석할 수 있습니다.
+- 지수별 성과 분석, 이동평균선 계산, 자동 데이터 업데이트 기능을 통해 가볍고 강력한 금융 분석 도구를 제공합니다.
 - 프로젝트 기간: 2026.05.14 ~ 2026.05.26
 
 ## 기술 스택
@@ -25,194 +24,191 @@ Findex는 외부 Open API와 연동하여 금융 지수 데이터를 제공하�
 
 ## 팀원별 구현 기능 상세
 #### 박교현
+  - 프로젝트 전체 총괄
   - 팀원 역할 분담 및 일정 관리
-  - Index Info CRUD API
-    - Index Info 등록 API
-    - Index Info 수정 API
-    - Index Info 조회 API
-      - cursor 기반 Index Info 목록 페이지 네이션 구현
-    - Index Info 삭제 API
-   
+  - 대시보드 주요 지수 기능 구현
+  - Index Info API (CRUD 기능)
+    - Index Info 등록 API 구현
+    - Index Info 수정 API 구현
+    - Index Info 삭제 API 구현
+    - 지수 정보 단건 조회 API 구현
+    - Index Info 목록 조회 API 구현
+      - 지수 정보 목록 조회 API 구현
+      - 지수 정보 요약 목록 조회 API 구현
+      - cursor 기반 Index Info 목록 페이지네이션 구현
+ - 로컬 개발환경 H2 데이터 베이스 구성
+ - 프론트 엔드 연동 검증 및 최적화
+
 #### 여운정
-  - 대시보드 API
+  - 대시보드 
+    - 지수 차트 조회 API
+    - 지수 성과 랭킹 조회 API 구현
+    - 관심 지수 성과 조회 API 구현
+    - 지수 데이터 CSV Export API 구현
+  - 자동 연동 설정
+    - 자동 연동 서비스 로직 구현 (scheduler 사용)
+    - 자동 연동 설정 수정 API
+    - 자동 연동 설정 목록 조회 API
+    - cursor 기반 Index Info 목록 페이지네이션 구현
+  - 프론트 엔드 연동 설정
 
 #### 이주혜
-  - Open API 연동 및 CRUD
+  - Open API 설정
+    - Open API 호출 로직 구현
+    - Open API 데이터 변환 및 저장 로직 구현
+    - Open API 응답 DTO 파싱 로직 구현
+  - Open API 예외 처리 설정
 
 #### 이태형
-  - Open API 자동 연동 및 CRUD
+  - Open API 연동 작업 API
+    - 지수 정보 저장 기능 구현
+    - 지수 정보 연동 API 구현
+    - 지수 데이터 연동 API 구현
+    - 연동 작업 목록 조회 API 구현
+      - 연동 작업 목록 페이지네이션 구현
 
 #### 정우진
-  - Index Data CRUD API
-    - Index Data 등록 API
-    - Index Data 수정 API
-    - Index Data 조회 API
-      - cursor 기반 Index Data 목록 페이지 네이션 구현
-    - Index Data 삭제 API
+  - Index Data API (CRUD 기능) 
+    - Index Data 등록 API 구현
+    - Index Data 수정 API 구현
+    - Index Data 조회 API 구현
+      - cursor 기반 Index Data 목록 페이지네이션 구현
+    - Index Data 삭제 API 구현
+    - 지수 데이터 CSV Export API 구현
+    - 전역 예외 처리 및 API 응답 구조 통일 
+
 
 ## 파일 구조
 ```
 src
- ├─main
- │ ├─java
- │ │  └─com
- │ │    └─codeit
- │ │      └─findex
- │ │         │  FindexApplication.java
- │ │         │
- │ │         ├─domain
- │ │         │  ├─autosync
- │ │         │  │  ├─controller
- │ │         │  │  │      AutoSyncController.java
- │ │         │  │  │
- │ │         │  │  ├─dto
- │ │         │  │  │      AutoSyncCreateRequest.java
- │ │         │  │  │      AutoSyncResponse.java
- │ │         │  │  │      AutoSyncUpdateRequest.java
- │ │         │  │  │      
- │ │         │  │  ├─entity
- │ │         │  │  │      AutoSync.java
- │ │         │  │  │
- │ │         │  │  ├─repository
- │ │         │  │  │      AutoSyncRepository.java
- │ │         │  │  │
- │ │         │  │  └─service
- │ │         │  │          AutoSyncService.java
- │ │         │  │
- │ │         │  ├─dashboard
- │ │         │  │  │  DashboardMapper.java
- │ │         │  │  │
- │ │         │  │  ├─controller
- │ │         │  │  │      DashboardController.java
- │ │         │  │  │
- │ │         │  │  ├─dto
- │ │         │  │  │      DashboardSummaryResponse.java
- │ │         │  │  │      IndexPerformanceResponse.java
- │ │         │  │  │
- │ │         │  │  └─service
- │ │         │  │          DashboardFavoriteService.java
- │ │         │  │
- │ │         │  ├─indexdata
- │ │         │  │  ├─controller
- │ │         │  │  │      IndexDataController.java
- │ │         │  │  │
- │ │         │  │  ├─dto
- │ │         │  │  │      CursorPageResponseIndexDataDto.java
- │ │         │  │  │      IndexDataCreateRequest.java
- │ │         │  │  │      IndexDataDto.java
- │ │         │  │  │      IndexDataSearchRequest.java
- │ │         │  │  │      IndexDataUpdateRequest.java
- │ │         │  │  │      IndexPerformanceDto.java
- │ │         │  │  │      RankedIndexPerformanceDto.java
- │ │         │  │  │
- │ │         │  │  ├─entity
- │ │         │  │  │      IndexData.java
- │ │         │  │  │      PeriodType.java
- │ │         │  │  │      SourceType.java
- │ │         │  │  │
- │ │         │  │  ├─mapper
- │ │         │  │  │      IndexDataMapper.java
- │ │         │  │  │
- │ │         │  │  ├─repository
- │ │         │  │  │      IndexDataRepository.java
- │ │         │  │  │      IndexDataRepositoryCustom.java
- │ │         │  │  │      IndexDataRepositoryCustomImpl.java
- │ │         │  │  │
- │ │         │  │  └─service
- │ │         │  │          IndexDataService.java
- │ │         │  │
- │ │         │  ├─indexinfo
- │ │         │  │  ├─controller
- │ │         │  │  │      IndexInfoController.java
- │ │         │  │  │
- │ │         │  │  ├─dto
- │ │         │  │  │      IndexInfoCreateRequest.java
- │ │         │  │  │      IndexInfoResponse.java
- │ │         │  │  │      IndexInfoUpdateRequest.java
- │ │         │  │  │
- │ │         │  │  ├─entity
- │ │         │  │  │      IndexInfo.java
- │ │         │  │  │
- │ │         │  │  ├─repository
- │ │         │  │  │      IndexInfoRepository.java
- │ │         │  │  │
- │ │         │  │  └─service
- │ │         │  │          IndexInfoService.java
- │ │         │  │
- │ │         │  └─syncjob
- │ │         │      ├─controller
- │ │         │      │      SyncJobController.java
- │ │         │      │
- │ │         │      ├─dto
- │ │         │      │      SyncJobDetailResponse.java
- │ │         │      │      SyncJobIndexDataSyncRequest.java
- │ │         │      │      SyncJobListResponse.java
- │ │         │      │      SyncJobSearchCondition.java
- │ │         │      │
- │ │         │      ├─entity
- │ │         │      │      SyncJob.java
- │ │         │      │
- │ │         │      ├─repository
- │ │         │      │      SyncJobRepository.java
- │ │         │      │
- │ │         │      ├─service
- │ │         │      │      SyncJobService.java
- │ │         │      │
- │ │         │      └─specification
- │ │         │              SyncJobSpecification.java
- │ │         │
- │ │         ├─global
- │ │         │  ├─common
- │ │         │  │  │  ApiResponse.java
- │ │         │  │  │
- │ │         │  │  └─dto
- │ │         │  │          CursorPageResponse.java
- │ │         │  │
- │ │         │  ├─config
- │ │         │  │      QuerydslConfig.java
- │ │         │  │      RestClientConfig.java
- │ │         │  │
- │ │         │  └─exception
- │ │         │          BusinessException.java
- │ │         │          ErrorCode.java
- │ │         │          ErrorResponse.java
- │ │         │          GlobalRestExceptionHandler.java
- │ │         │
- │ │         └─infra
- │ │             └─openapi
- │ │                 │  OpenApiClient.java
- │ │                 │  OpenApiService.java
- │ │                 │
- │ │                 ├─config
- │ │                 │      OpenApiProperties.java
- │ │                 │
- │ │                 ├─dto
- │ │                 │      OpenApiIndexItemDto.java
- │ │                 │      OpenApiResponseDto.java
- │ │                 │
- │ │                 └─parser
- │ │                         OpenApiResponseParser.java
- │ │
- │ └─resources
- │         application.yaml
- │         schema-h2.sql
- │         schema.sql
- │
- └─test
-     └─java
-         └─com
-             └─codeit
-                 └─findex
-                     │  FindexApplicationTests.java
-                     │
-                     └─infra
-                         └─openapi
-                             └─parser
-                                     OpenApiResponseParserTest.java
-
-
+├─ main
+│  ├─ java
+│  │  └─ com.codeit.findex
+│  │     ├─ FindexApplication.java
+│  │     │
+│  │     ├─ domain
+│  │     │  ├─ autosync
+│  │     │  │  ├─ controller
+│  │     │  │  │  └─ AutoSyncController.java
+│  │     │  │  ├─ dto
+│  │     │  │  │  ├─ AutoSyncCreateRequest.java
+│  │     │  │  │  ├─ AutoSyncResponse.java
+│  │     │  │  │  └─ AutoSyncUpdateRequest.java
+│  │     │  │  ├─ entity
+│  │     │  │  │  └─ AutoSync.java
+│  │     │  │  ├─ repository
+│  │     │  │  │  └─ AutoSyncRepository.java
+│  │     │  │  └─ service
+│  │     │  │     └─ AutoSyncService.java
+│  │     │  │
+│  │     │  ├─ dashboard
+│  │     │  │  ├─ DashboardMapper.java
+│  │     │  │  ├─ controller
+│  │     │  │  │  └─ DashboardController.java
+│  │     │  │  ├─ dto
+│  │     │  │  │  ├─ DashboardSummaryResponse.java
+│  │     │  │  │  └─ IndexPerformanceResponse.java
+│  │     │  │  └─ service
+│  │     │  │     └─ DashboardFavoriteService.java
+│  │     │  │
+│  │     │  ├─ indexdata
+│  │     │  │  ├─ controller
+│  │     │  │  │  └─ IndexDataController.java
+│  │     │  │  ├─ dto
+│  │     │  │  │  ├─ CursorPageResponseIndexDataDto.java
+│  │     │  │  │  ├─ IndexDataCreateRequest.java
+│  │     │  │  │  ├─ IndexDataDto.java
+│  │     │  │  │  ├─ IndexDataSearchRequest.java
+│  │     │  │  │  ├─ IndexDataUpdateRequest.java
+│  │     │  │  │  ├─ IndexPerformanceDto.java
+│  │     │  │  │  └─ RankedIndexPerformanceDto.java
+│  │     │  │  ├─ entity
+│  │     │  │  │  ├─ IndexData.java
+│  │     │  │  │  ├─ PeriodType.java
+│  │     │  │  │  └─ SourceType.java
+│  │     │  │  ├─ mapper
+│  │     │  │  │  └─ IndexDataMapper.java
+│  │     │  │  ├─ repository
+│  │     │  │  │  ├─ IndexDataRepository.java
+│  │     │  │  │  ├─ IndexDataRepositoryCustom.java
+│  │     │  │  │  └─ IndexDataRepositoryCustomImpl.java
+│  │     │  │  └─ service
+│  │     │  │     └─ IndexDataService.java
+│  │     │  │
+│  │     │  ├─ indexinfo
+│  │     │  │  ├─ controller
+│  │     │  │  │  └─ IndexInfoController.java
+│  │     │  │  ├─ dto
+│  │     │  │  │  ├─ IndexInfoCreateRequest.java
+│  │     │  │  │  ├─ IndexInfoResponse.java
+│  │     │  │  │  └─ IndexInfoUpdateRequest.java
+│  │     │  │  ├─ entity
+│  │     │  │  │  └─ IndexInfo.java
+│  │     │  │  ├─ repository
+│  │     │  │  │  └─ IndexInfoRepository.java
+│  │     │  │  └─ service
+│  │     │  │     └─ IndexInfoService.java
+│  │     │  │
+│  │     │  └─ syncjob
+│  │     │     ├─ controller
+│  │     │     │  └─ SyncJobController.java
+│  │     │     ├─ dto
+│  │     │     │  ├─ SyncJobDetailResponse.java
+│  │     │     │  ├─ SyncJobIndexDataSyncRequest.java
+│  │     │     │  ├─ SyncJobListResponse.java
+│  │     │     │  └─ SyncJobSearchCondition.java
+│  │     │     ├─ entity
+│  │     │     │  └─ SyncJob.java
+│  │     │     ├─ repository
+│  │     │     │  └─ SyncJobRepository.java
+│  │     │     ├─ service
+│  │     │     │  └─ SyncJobService.java
+│  │     │     └─ specification
+│  │     │        └─ SyncJobSpecification.java
+│  │     │
+│  │     ├─ global
+│  │     │  ├─ common
+│  │     │  │  ├─ ApiResponse.java
+│  │     │  │  └─ dto
+│  │     │  │     └─ CursorPageResponse.java
+│  │     │  ├─ config
+│  │     │  │  ├─ QuerydslConfig.java
+│  │     │  │  └─ RestClientConfig.java
+│  │     │  └─ exception
+│  │     │     ├─ BusinessException.java
+│  │     │     ├─ ErrorCode.java
+│  │     │     ├─ ErrorResponse.java
+│  │     │     └─ GlobalRestExceptionHandler.java
+│  │     │
+│  │     └─ infra
+│  │        └─ openapi
+│  │           ├─ OpenApiClient.java
+│  │           ├─ OpenApiService.java
+│  │           ├─ config
+│  │           │  └─ OpenApiProperties.java
+│  │           ├─ dto
+│  │           │  ├─ OpenApiIndexItemDto.java
+│  │           │  └─ OpenApiResponseDto.java
+│  │           └─ parser
+│  │              └─ OpenApiResponseParser.java
+│  │
+│  └─ resources
+│     ├─ application.yaml
+│     ├─ schema-h2.sql
+│     └─ schema.sql
+│
+└─ test
+   └─ java
+      └─ com.codeit.findex
+         ├─ FindexApplicationTests.java
+         └─ infra
+            └─ openapi
+               └─ parser
+                  └─ OpenApiResponseParserTest.java
 ```
 
 ## 구현 홈페이지
+(개발한 홈페이지 링크 게시)
 
 ## 프로젝트 회고록
+(발표 자료 링크 혹은 첨부파일)
