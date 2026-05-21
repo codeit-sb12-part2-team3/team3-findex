@@ -9,7 +9,7 @@ public record SyncJobSearchCondition(
         UUID indexId,
         LocalDate targetDate,
         String worker,
-        String result,
+        String status,
 
         LocalDateTime jobTimeFrom,
         LocalDateTime jobTimeTo

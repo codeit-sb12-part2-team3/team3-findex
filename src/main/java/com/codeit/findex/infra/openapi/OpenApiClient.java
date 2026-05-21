@@ -43,17 +43,6 @@ public class OpenApiClient {
         OpenApiResponseDto response;
 
         try {
-            String rawResponse = restClient.get()
-                    .uri(url)
-                    .retrieve()
-                    .body(String.class);
-
-            System.out.println("=================================");
-            System.out.println("OpenAPI URL = " + url);
-            System.out.println("OpenAPI RAW RESPONSE = ");
-            System.out.println(rawResponse);
-            System.out.println("=================================");
-
             response = restClient.get()
                     .uri(url)
                     .retrieve()

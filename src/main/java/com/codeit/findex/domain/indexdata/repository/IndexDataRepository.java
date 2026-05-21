@@ -18,4 +18,6 @@ public interface IndexDataRepository extends JpaRepository<IndexData, UUID>, Ind
     List<IndexData> findByIndexInfoIdAndBaseDateBetweenOrderByFluctuationRateDesc(UUID indexInfoId, LocalDate baseDateAfter, LocalDate baseDateBefore, Limit limit);
 
     List<IndexData> findByBaseDateBetweenOrderByFluctuationRateDesc(LocalDate baseDateAfter, LocalDate baseDateBefore, Limit limit);
+
+    boolean existsByIndexInfoIdAndBaseDate(UUID indexInfoId, LocalDate baseDate);
 }

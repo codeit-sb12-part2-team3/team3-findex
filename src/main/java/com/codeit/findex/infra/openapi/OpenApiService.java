@@ -2,6 +2,7 @@ package com.codeit.findex.infra.openapi;
 
 import com.codeit.findex.domain.indexdata.dto.IndexDataCreateRequest;
 import com.codeit.findex.domain.indexdata.entity.SourceType;
+import com.codeit.findex.domain.indexdata.repository.IndexDataRepository;
 import com.codeit.findex.domain.indexdata.service.IndexDataService;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoCreateRequest;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoResponse;
@@ -32,8 +33,8 @@ public class OpenApiService {
     private final IndexInfoService indexInfoService;
     private final IndexDataService indexDataService;
     private final IndexInfoRepository indexInfoRepository;
+    private final IndexDataRepository indexDataRepository;
 
-    // 전체 지수 정보 저장 (DB 비어있을 때)
     @Transactional
     public List<OpenApiIndexItemDto> syncAndSaveAllIndexInfo() {
         OpenApiResponseDto response = openApiClient.getStockMarketIndex(
@@ -53,7 +54,7 @@ public class OpenApiService {
                         item.getEpyItmsCnt() != null
                                 ? Integer.parseInt(item.getEpyItmsCnt())
                                 : null,
-                        null,
+                        existing.get().getBasePointInTime(),
                         item.getBasIdx() != null
                                 ? new BigDecimal(item.getBasIdx())
                                 : null,
@@ -81,11 +82,10 @@ public class OpenApiService {
         return items;
     }
 
-    // 특정 지수 정보 저장
     @Transactional
     public List<OpenApiIndexItemDto> syncAndSaveIndexInfo(String indexName) {
         OpenApiResponseDto response = openApiClient.getStockMarketIndex(
-                indexName, null, 1, 100);
+                indexName, null, 1, 10);
 
         List<OpenApiIndexItemDto> items =
                 openApiResponseParser.parseItems(response);
@@ -101,7 +101,7 @@ public class OpenApiService {
                         item.getEpyItmsCnt() != null
                                 ? Integer.parseInt(item.getEpyItmsCnt())
                                 : null,
-                        null,
+                        existing.get().getBasePointInTime(),
                         item.getBasIdx() != null
                                 ? new BigDecimal(item.getBasIdx())
                                 : null,
@@ -129,7 +129,6 @@ public class OpenApiService {
         return items;
     }
 
-    // 지수 데이터 저장
     @Transactional
     public List<OpenApiIndexItemDto> syncAndSaveIndexData(
             String indexName,
@@ -143,37 +142,64 @@ public class OpenApiService {
         List<OpenApiIndexItemDto> items =
                 openApiResponseParser.parseItems(response);
 
+        if (items == null || items.isEmpty()) {
+            return List.of();
+        }
+
         items = items.stream()
                 .filter(item -> item.getIdxNm() != null
                         && item.getIdxNm().contains(indexName))
                 .toList();
 
-        if (items == null || items.isEmpty()) {
-            throw new BusinessException(ErrorCode.OPEN_API_INVALID_RESPONSE);
+        if (items.isEmpty()) {
+            return List.of();
         }
 
         for (OpenApiIndexItemDto item : items) {
-            IndexInfoCreateRequest indexInfoRequest =
-                    new IndexInfoCreateRequest(
-                            item.getIdxNm(),
-                            item.getIdxCsf(),
-                            item.getEpyItmsCnt() != null
-                                    ? Integer.parseInt(item.getEpyItmsCnt())
-                                    : null,
-                            null,
-                            item.getBasIdx() != null
-                                    ? new BigDecimal(item.getBasIdx())
-                                    : null,
-                            false
-                    );
 
-            IndexInfoResponse savedInfo =
-                    indexInfoService.create(indexInfoRequest);
+            Optional<IndexInfo> existing = indexInfoRepository.findByIndexName(item.getIdxNm());
+            IndexInfoResponse savedInfo;
+
+            if (existing.isPresent()) {
+                IndexInfo indexInfo = existing.get();
+                savedInfo = new IndexInfoResponse(
+                        indexInfo.getId(),
+                        indexInfo.getIndexName(),
+                        indexInfo.getIndexClassification(),
+                        indexInfo.getEmployedItemsCount(),
+                        indexInfo.getBasePointInTime(),
+                        indexInfo.getBaseIndex(),
+                        indexInfo.getSourceType().name(),
+                        indexInfo.getFavorite(),
+                        indexInfo.getCreatedAt(),
+                        indexInfo.getUpdatedAt()
+                );
+            } else {
+                IndexInfoCreateRequest indexInfoRequest =
+                        new IndexInfoCreateRequest(
+                                item.getIdxNm(),
+                                item.getIdxCsf(),
+                                item.getEpyItmsCnt() != null
+                                        ? Integer.parseInt(item.getEpyItmsCnt())
+                                        : null,
+                                null,
+                                item.getBasIdx() != null
+                                        ? new BigDecimal(item.getBasIdx())
+                                        : null,
+                                false
+                        );
+                savedInfo = indexInfoService.create(indexInfoRequest);
+            }
 
             LocalDate parsedDate = LocalDate.parse(
                     item.getBasDt(),
                     DateTimeFormatter.ofPattern("yyyyMMdd")
             );
+
+            // 중복 체크 - 이미 있으면 저장 안 함
+            if (indexDataRepository.existsByIndexInfoIdAndBaseDate(savedInfo.id(), parsedDate)) {
+                continue;
+            }
 
             IndexDataCreateRequest indexDataCreateRequest =
                     new IndexDataCreateRequest(
@@ -190,12 +216,7 @@ public class OpenApiService {
                             Long.parseLong(item.getLstgMrktTotAmt())
                     );
 
-            try {
-                indexDataService.create(indexDataCreateRequest, SourceType.OPEN_API);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new BusinessException(ErrorCode.OPEN_API_SAVE_FAILED);
-            }
+            indexDataService.create(indexDataCreateRequest, SourceType.OPEN_API);
         }
 
         return items;
