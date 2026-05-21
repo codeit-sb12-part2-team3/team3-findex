@@ -26,11 +26,11 @@ public class SyncJobSpecification {
                 );
             }
 
-            if (condition.indexId() != null) {
+            if (condition.indexInfoId() != null) {
                 predicates.add(
                         cb.equal(
                                 root.get("indexInfo").get("id"),
-                                condition.indexId()
+                                condition.indexInfoId()
                         )
                 );
             }

@@ -25,7 +25,7 @@ public class SyncJobController {
     @GetMapping
     public Slice<SyncJobListResponse> getSyncJobList(
             @RequestParam(required = false) String jobType,
-            @RequestParam(required = false) UUID indexId,
+            @RequestParam(name = "indexInfoId", required = false) UUID indexId,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate,
             @RequestParam(required = false) String worker,
