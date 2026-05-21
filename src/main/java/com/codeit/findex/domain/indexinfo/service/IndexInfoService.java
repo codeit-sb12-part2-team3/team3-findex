@@ -10,13 +10,17 @@ import com.codeit.findex.global.common.dto.CursorPageResponse;
 import com.codeit.findex.global.exception.BusinessException;
 import com.codeit.findex.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,53 +41,57 @@ public class IndexInfoService {
 
     // 요청 DTO -> Entity 변환
     private IndexInfoResponse create(IndexInfoCreateRequest request, SourceType sourceType) {
-
-        // null 방지
-        LocalDate safeBasePointInTime = request.basePointInTime() != null
-                ? request.basePointInTime()
-                : LocalDate.of(1900, 1, 1); // 임의의 기준일 설정
-
-        BigDecimal safeBaseIndex = request.baseIndex() != null
-                ? request.baseIndex()
-                : new BigDecimal("100.00"); // 임의의 기준 지수 설정
-
-        Boolean safeFavorite = request.favorite() != null
-                ? request.favorite()
-                : false; // 즐겨찾기 기본값
-
-        IndexInfo indexInfo = IndexInfo.builder()
-                .indexName(request.indexName())
-                .indexClassification(request.indexClassification())
-                .employedItemsCount(request.employedItemsCount())
-                .basePointInTime(safeBasePointInTime) // 안전한 값 대입
-                .baseIndex(safeBaseIndex)             // 안전한 값 대입
-                .sourceType(sourceType)
-                .favorite(safeFavorite)               // 안전한 값 대입
-                .build();
-
-        IndexInfo saved = indexInfoRepository.saveAndFlush(indexInfo);
-
+        IndexInfo indexInfo = buildIndexInfo(request, sourceType);
+        IndexInfo saved = indexInfoRepository.save(indexInfo);
         return toResponse(saved);
     }
-
     // Open API 지수 정보 동기화
     public IndexInfoResponse syncIndexInfo(IndexInfoCreateRequest request) {
         return indexInfoRepository.findByIndexName(request.indexName())
                 .map(indexInfo -> {
                     // 업데이트 시에도 기존 값 유지
-                    BigDecimal safeBaseIndex = request.baseIndex() != null
-                            ? request.baseIndex()
-                            : indexInfo.getBaseIndex();
+                    updateExistingIndexInfo(indexInfo, request);
 
-                    indexInfo.updateMarketInfo(
-                            request.employedItemsCount(),
-                            indexInfo.getBasePointInTime(),
-                            safeBaseIndex,
-                            indexInfo.getFavorite()
-                    );
                     return toResponse(indexInfo);
                 })
                 .orElseGet(() -> createFromOpenApi(request));
+    }
+
+    public List<IndexInfoResponse> syncIndexInfos(List<IndexInfoCreateRequest> requests) {
+        List<String> indexNames = requests.stream()
+                .map(IndexInfoCreateRequest::indexName)
+                .distinct()
+                .toList();
+
+        Map<String, IndexInfo> existingMap = indexInfoRepository.findByIndexNameIn(indexNames)
+                .stream()
+                .collect(Collectors.toMap(
+                        IndexInfo::getIndexName,
+                        indexInfo -> indexInfo
+                ));
+
+        List<IndexInfo> newIndexInfos = new ArrayList<>();
+
+        for (IndexInfoCreateRequest request : requests) {
+            IndexInfo existing = existingMap.get(request.indexName());
+
+            if (existing != null) {
+                updateExistingIndexInfo(existing, request);
+            } else {
+                IndexInfo newIndexInfo = buildIndexInfo(request, SourceType.OPEN_API);
+                newIndexInfos.add(newIndexInfo);
+                existingMap.put(request.indexName(), newIndexInfo);
+            }
+        }
+
+        if (!newIndexInfos.isEmpty()) {
+            indexInfoRepository.saveAll(newIndexInfos);
+        }
+
+        return existingMap.values()
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     // 지수 정보 목록 조회
@@ -93,14 +101,15 @@ public class IndexInfoService {
             String indexName,
             Boolean favorite
     ) {
-        List<IndexInfoResponse> content = indexInfoRepository.findAll()
+
+        List<IndexInfoResponse> content = indexInfoRepository
+                .search(
+                        indexClassification,
+                        indexName,
+                        favorite,
+                        PageRequest.of(0, 100)
+                )
                 .stream()
-                .filter(indexInfo -> indexClassification == null || indexClassification.isBlank()
-                        || indexInfo.getIndexClassification().contains(indexClassification))
-                .filter(indexInfo -> indexName == null || indexName.isBlank()
-                        || indexInfo.getIndexName().contains(indexName))
-                .filter(indexInfo -> favorite == null
-                        || indexInfo.getFavorite().equals(favorite))
                 .map(this::toResponse)
                 .toList();
 
@@ -146,7 +155,44 @@ public class IndexInfoService {
     public void delete(UUID id) {
         getIndexInfo(id);
         indexInfoRepository.deleteById(id);
-        indexInfoRepository.flush(); // 즉시 삭제 반영
+        indexInfoRepository.flush();
+    }
+
+    private IndexInfo buildIndexInfo(IndexInfoCreateRequest request, SourceType sourceType) {
+        LocalDate safeBasePointInTime = request.basePointInTime() != null
+                ? request.basePointInTime()
+                : LocalDate.of(1900, 1, 1);
+
+        BigDecimal safeBaseIndex = request.baseIndex() != null
+                ? request.baseIndex()
+                : new BigDecimal("100.00");
+
+        Boolean safeFavorite = request.favorite() != null
+                ? request.favorite()
+                : false;
+
+        return IndexInfo.builder()
+                .indexName(request.indexName())
+                .indexClassification(request.indexClassification())
+                .employedItemsCount(request.employedItemsCount())
+                .basePointInTime(safeBasePointInTime)
+                .baseIndex(safeBaseIndex)
+                .sourceType(sourceType)
+                .favorite(safeFavorite)
+                .build();
+    }
+
+    private void updateExistingIndexInfo(IndexInfo indexInfo, IndexInfoCreateRequest request) {
+        BigDecimal safeBaseIndex = request.baseIndex() != null
+                ? request.baseIndex()
+                : indexInfo.getBaseIndex();
+
+        indexInfo.updateMarketInfo(
+                request.employedItemsCount(),
+                indexInfo.getBasePointInTime(),
+                safeBaseIndex,
+                indexInfo.getFavorite()
+        );
     }
 
     // 내부 조회

@@ -1,17 +1,15 @@
 package com.codeit.findex.domain.indexdata.entity;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -33,13 +31,11 @@ public class IndexData {
     @Column(updatable = false, nullable = false)
     private UUID id;
 
-//    @Column(name = "index_id", nullable = false)
-//    private UUID indexInfoId;
     @Column(
-        name = "index_id",
-        nullable = false,
-        insertable = false,
-        updatable = false
+            name = "index_id",
+            nullable = false,
+            insertable = false,
+            updatable = false
     )
     private UUID indexInfoId;
 
@@ -47,8 +43,7 @@ public class IndexData {
     @JoinColumn(name = "index_id", nullable = false)
     private IndexInfo indexInfo;
 
-    @Column(name = "base_date",nullable = false,
-    columnDefinition = "기준 일자")
+    @Column(name = "base_date", nullable = false)
     private LocalDate baseDate;
 
     @Column(name = "source_type", nullable = false)
@@ -89,4 +84,26 @@ public class IndexData {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public void updateValues(
+            BigDecimal marketPrice,
+            BigDecimal closingPrice,
+            BigDecimal highPrice,
+            BigDecimal lowPrice,
+            BigDecimal versus,
+            BigDecimal fluctuationRate,
+            Long tradingQuantity,
+            Long tradingPrice,
+            Long marketTotalAmount
+    ) {
+        this.marketPrice = marketPrice;
+        this.closingPrice = closingPrice;
+        this.highPrice = highPrice;
+        this.lowPrice = lowPrice;
+        this.versus = versus;
+        this.fluctuationRate = fluctuationRate;
+        this.tradingQuantity = tradingQuantity;
+        this.tradingPrice = tradingPrice;
+        this.marketTotalAmount = marketTotalAmount;
+    }
 }
