@@ -1,6 +1,7 @@
 package com.codeit.findex.domain.indexinfo.repository;
 
 import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,20 +14,4 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, UUID> {
 
     Optional<IndexInfo> findByIndexName(String indexName);
 
-    boolean existsByIndexName(String indexName);
-
-    // DB 레벨 필터링으로 전체 로딩 방지
-    @Query("SELECT i FROM IndexInfo i WHERE " +
-            "(:indexClassification IS NULL OR i.indexClassification LIKE %:indexClassification%) AND " +
-            "(:indexName IS NULL OR i.indexName LIKE %:indexName%) AND " +
-            "(:favorite IS NULL OR i.favorite = :favorite)")
-    List<IndexInfo> findAllByFilter(
-            @Param("indexClassification") String indexClassification,
-            @Param("indexName") String indexName,
-            @Param("favorite") Boolean favorite
-    );
-
-    // AutoSync 레코드가 없는 IndexInfo만 반환 (누락된 AutoSync 동기화용)
-    @Query("SELECT i FROM IndexInfo i WHERE i.id NOT IN (SELECT a.indexInfo.id FROM AutoSync a)")
-    List<IndexInfo> findIndexInfoWithoutAutoSync();
 }
