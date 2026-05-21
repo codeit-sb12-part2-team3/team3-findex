@@ -25,8 +25,8 @@ public class AutoSyncController implements AutoSyncApi {
      */
     @GetMapping
     public ResponseEntity<CursorPageResponseAutoSyncConfigDto> getAutoSyncConfigs(
-            @RequestParam(required = false) UUID nextIdAfter,
-            @RequestParam(required = false) UUID indexId,
+            @RequestParam(name = "idAfter", required = false) UUID nextIdAfter,
+            @RequestParam(name = "indexInfoId", required = false) UUID indexId,
             @RequestParam(required = false) Boolean enabled,
             @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "10") int size) {

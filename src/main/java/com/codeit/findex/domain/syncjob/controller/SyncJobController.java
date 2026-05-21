@@ -36,9 +36,9 @@ public class SyncJobController implements SyncJobApi {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobTimeFrom,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobTimeTo,
-            @RequestParam(required = false)
+            @RequestParam(name = "cursor", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastJobTime,
-            @RequestParam(required = false) UUID lastId,
+            @RequestParam(name = "idAfter", required = false) UUID lastId,
             @RequestParam(required = false, defaultValue = "jobTime") String sortField,
             @RequestParam(required = false, defaultValue = "desc") String sortDirection,
             @RequestParam(defaultValue = "10") int size

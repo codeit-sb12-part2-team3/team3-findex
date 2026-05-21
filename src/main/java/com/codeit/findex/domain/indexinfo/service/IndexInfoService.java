@@ -10,7 +10,6 @@ import com.codeit.findex.global.common.dto.CursorPageResponse;
 import com.codeit.findex.global.exception.BusinessException;
 import com.codeit.findex.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Pageable.unpaged;
 
 @Service
 @RequiredArgsConstructor
@@ -107,7 +108,7 @@ public class IndexInfoService {
                         indexClassification,
                         indexName,
                         favorite,
-                        PageRequest.of(0, 100)
+                        unpaged()
                 )
                 .stream()
                 .map(this::toResponse)
@@ -187,9 +188,13 @@ public class IndexInfoService {
                 ? request.baseIndex()
                 : indexInfo.getBaseIndex();
 
+        LocalDate safeBasePointInTime = request.basePointInTime() != null
+                ? request.basePointInTime()
+                : indexInfo.getBasePointInTime();
+
         indexInfo.updateMarketInfo(
                 request.employedItemsCount(),
-                indexInfo.getBasePointInTime(),
+                safeBasePointInTime,
                 safeBaseIndex,
                 indexInfo.getFavorite()
         );
