@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public record IndexDataSearchRequest(
-        UUID indexInfoId,
+        String indexInfoId,
         LocalDate startDate,
         LocalDate endDate,
 

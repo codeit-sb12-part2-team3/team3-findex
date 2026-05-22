@@ -9,6 +9,7 @@ import com.codeit.findex.domain.syncjob.repository.SyncJobRepository;
 import com.codeit.findex.infra.openapi.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "scheduler.auto-sync.enabled", havingValue = "true", matchIfMissing = true)
 public class AutoSyncScheduler {
 
     private static final String INDEX_DATA_JOB = "INDEX_DATA";

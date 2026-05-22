@@ -2,6 +2,7 @@ package com.codeit.findex.domain.indexinfo.controller.api;
 
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoCreateRequest;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoResponse;
+import com.codeit.findex.domain.indexinfo.dto.IndexInfoSummaryDto;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoUpdateRequest;
 import com.codeit.findex.global.common.dto.CursorPageResponse;
 import com.codeit.findex.global.exception.ErrorResponse;
@@ -68,7 +69,15 @@ public interface IndexInfoApi {
 
             @Parameter(description="즐겨찾기 여부")
             @RequestParam(required=false)
-            Boolean favorite
+            Boolean favorite,
+
+            @Parameter(description="정렬 필드 (indexClassification, indexName, employedItemsCount)")
+            @RequestParam(required=false, defaultValue="indexClassification")
+            String sortField,
+
+            @Parameter(description="정렬 방향 (asc, desc)")
+            @RequestParam(required=false, defaultValue="asc")
+            String sortDirection
     );
 
 
@@ -89,7 +98,7 @@ public interface IndexInfoApi {
                     )
             )
     })
-    ResponseEntity<List<IndexInfoResponse>> getSummaries();
+    ResponseEntity<List<IndexInfoSummaryDto>> getSummaries();
 
 
     @Operation(

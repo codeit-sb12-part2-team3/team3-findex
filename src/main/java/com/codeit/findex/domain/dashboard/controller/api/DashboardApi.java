@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
-import java.util.UUID;
 
 @Tag(
         name = "대시보드 API",
@@ -90,9 +89,9 @@ public interface DashboardApi {
             @RequestParam(defaultValue="DAILY")
             PeriodType periodType,
 
-            @Parameter(description="지수 ID (선택)")
+            @Parameter(description="지수 numeric ID (선택)")
             @RequestParam(required = false)
-            UUID indexInfoId,
+            String indexInfoId,
 
             @Parameter(description="조회 개수 (기본 10)")
             @RequestParam(defaultValue = "10")
@@ -123,8 +122,8 @@ public interface DashboardApi {
     })
     ResponseEntity<IndexChartDto> getIndexChart(
 
-            @Parameter(description = "지수 ID")
-            @PathVariable UUID id,
+            @Parameter(description = "지수 ID (UUID 또는 numeric ID)")
+            @PathVariable String id,
 
             @Parameter(description = "조회 기간")
             @RequestParam(defaultValue = "MONTHLY")

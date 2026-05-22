@@ -3,6 +3,7 @@ package com.codeit.findex.domain.indexdata.repository;
 import com.codeit.findex.domain.indexdata.dto.IndexDataSearchRequest;
 import com.codeit.findex.domain.indexdata.entity.IndexData;
 import com.codeit.findex.domain.indexdata.entity.QIndexData;
+import com.codeit.findex.global.util.UuidResolver;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class IndexDataRepositoryCustomImpl implements IndexDataRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    private final UuidResolver uuidResolver;
 
     private static final QIndexData indexData = QIndexData.indexData;
 
@@ -84,8 +86,10 @@ public class IndexDataRepositoryCustomImpl implements IndexDataRepositoryCustom 
         return totalCount != null ? totalCount.intValue() : 0;
     }
 
-    private BooleanExpression eqIndexInfoId(UUID indexInfoId) {
-        return indexInfoId != null ? indexData.indexInfo.id.eq(indexInfoId) : null;
+    private BooleanExpression eqIndexInfoId(String indexInfoId) {
+        if (indexInfoId == null || indexInfoId.isBlank()) return null;
+        UUID uuid = uuidResolver.resolve(indexInfoId);
+        return uuid != null ? indexData.indexInfo.id.eq(uuid) : null;
     }
 
     private BooleanExpression betweenBaseDate(LocalDate startDate, LocalDate endDate) {

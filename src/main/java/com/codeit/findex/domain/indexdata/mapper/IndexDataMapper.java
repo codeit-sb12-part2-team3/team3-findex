@@ -19,6 +19,7 @@ public interface IndexDataMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "indexInfo", ignore = true)
+    @Mapping(target = "indexInfoId", ignore = true)
     @Mapping(target = "sourceType", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

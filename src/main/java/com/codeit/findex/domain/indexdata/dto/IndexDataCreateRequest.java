@@ -2,10 +2,9 @@ package com.codeit.findex.domain.indexdata.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
 
 public record IndexDataCreateRequest(
-        UUID indexInfoId,
+        String indexInfoId,
 
         LocalDate baseDate,
 

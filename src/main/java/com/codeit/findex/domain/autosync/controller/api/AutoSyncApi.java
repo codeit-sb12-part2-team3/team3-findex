@@ -45,10 +45,10 @@ public interface AutoSyncApi {
     })
     ResponseEntity<CursorPageResponseAutoSyncConfigDto> getAutoSyncConfigs(
             @Parameter(description="다음 페이지 Cursor")
-            @RequestParam(required=false) UUID nextIdAfter,
+            @RequestParam(name="idAfter", required=false) UUID nextIdAfter,
 
-            @Parameter(description="지수 ID")
-            @RequestParam(required=false) UUID indexId,
+            @Parameter(description="지수 ID (UUID 또는 numeric ID)")
+            @RequestParam(name="indexInfoId", required=false) String indexInfoId,
 
             @Parameter(description="활성 여부")
             @RequestParam(required=false) Boolean enabled,

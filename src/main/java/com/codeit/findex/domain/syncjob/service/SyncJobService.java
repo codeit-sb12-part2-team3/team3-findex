@@ -3,6 +3,7 @@ package com.codeit.findex.domain.syncjob.service;
 import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
 import com.codeit.findex.domain.syncjob.dto.CursorPageResponseSyncJobDto;
+import com.codeit.findex.global.util.UuidResolver;
 import com.codeit.findex.domain.syncjob.dto.SyncJobDetailResponse;
 import com.codeit.findex.domain.syncjob.dto.SyncJobSearchCondition;
 import com.codeit.findex.domain.syncjob.entity.SyncJob;
@@ -36,6 +37,7 @@ public class SyncJobService {
     private final SyncJobRepository syncJobRepository;
     private final OpenApiService openApiService;
     private final IndexInfoRepository indexInfoRepository;
+    private final UuidResolver uuidResolver;
 
     public CursorPageResponseSyncJobDto getSyncJobList(
             SyncJobSearchCondition condition,
@@ -221,8 +223,12 @@ public class SyncJobService {
 
         return indexInfoIds.stream()
                 .filter(id -> id != null && !id.isBlank())
-                .map(id -> indexInfoRepository.findById(UUID.fromString(id))
-                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지수입니다.")))
+                .map(id -> {
+                    UUID uuid = uuidResolver.resolve(id);
+                    if (uuid == null) throw new IllegalArgumentException("존재하지 않는 지수입니다: " + id);
+                    return indexInfoRepository.findById(uuid)
+                            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 지수입니다: " + id));
+                })
                 .toList();
     }
 

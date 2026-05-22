@@ -39,7 +39,7 @@ public class DataInitializer {
         if (latestDate == null) {
             log.info("[초기화] 지수 데이터 없음 → 최근 7일 데이터 연동 시작");
             LocalDate end = LocalDate.now().minusDays(1);
-            LocalDate start = end.minusDays(6);
+            LocalDate start = end.minusDays(89);
 
             for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
                 String baseDateStr = date.format(DateTimeFormatter.BASIC_ISO_DATE);
