@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class AutoSyncScheduler {
     private static final String SUCCESS = "SUCCESS";
     private static final String FAILED = "FAILED";
     private static final String SCHEDULER_WORKER = "관리자";
+    private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Seoul");
 
     private final AutoSyncRepository autoSyncRepository;
     private final IndexDataRepository indexDataRepository;
@@ -50,8 +52,8 @@ public class AutoSyncScheduler {
             // 해당 지수의 가장 최근 baseDate 조회
             LocalDate latestDate = indexDataRepository.findMaxBaseDateByIndexInfoId(indexInfo.getId());
 
-            // 장 마감(15:30) 후 데이터가 확정되므로 전일까지만 연동
-            LocalDate endDate = LocalDate.now().minusDays(1);
+            // 장 마감(15:30) 후 데이터가 확정되므로 전일까지만 연동 (KST 기준)
+            LocalDate endDate = LocalDate.now(BUSINESS_ZONE).minusDays(1);
 
             LocalDate startDate = (latestDate != null)
                     ? latestDate.plusDays(1)
@@ -87,7 +89,7 @@ public class AutoSyncScheduler {
                         .jobType(INDEX_DATA_JOB)
                         .targetDate(targetDate)
                         .worker(SCHEDULER_WORKER)
-                        .jobTime(LocalDateTime.now())
+                        .jobTime(LocalDateTime.now(BUSINESS_ZONE))
                         .result(result)
                         .build());
 
