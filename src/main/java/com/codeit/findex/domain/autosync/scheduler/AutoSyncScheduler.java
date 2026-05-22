@@ -2,12 +2,20 @@ package com.codeit.findex.domain.autosync.scheduler;
 
 import com.codeit.findex.domain.autosync.entity.AutoSync;
 import com.codeit.findex.domain.autosync.repository.AutoSyncRepository;
+import com.codeit.findex.domain.indexdata.repository.IndexDataRepository;
+import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
+import com.codeit.findex.domain.syncjob.entity.SyncJob;
+import com.codeit.findex.domain.syncjob.repository.SyncJobRepository;
+import com.codeit.findex.infra.openapi.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
@@ -15,46 +23,80 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AutoSyncScheduler {
 
-    private final AutoSyncRepository autoSyncRepository;
-    // TODO: 외부 API 호출 서비스나 데이터 저장 서비스 여기에 주입
+    private static final String INDEX_DATA_JOB = "INDEX_DATA";
+    private static final String SUCCESS = "SUCCESS";
+    private static final String FAILED = "FAILED";
+    private static final String SCHEDULER_WORKER = "관리자";
+    private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Seoul");
 
+    private final AutoSyncRepository autoSyncRepository;
+    private final IndexDataRepository indexDataRepository;
+    private final OpenApiService openApiService;
+    private final SyncJobRepository syncJobRepository;
 
     @Scheduled(cron = "${scheduler.auto-sync.cron}")
     public void runAutoSyncBatch() {
-        log.info(" [자동 연동 스케줄러] 매일 자정 배치 작업을 시작합니다...");
+        log.info("[자동 연동 스케줄러] 매일 자정 배치 작업을 시작합니다...");
 
-        // 스위치가 켜진(enabled = true) 지수들 수집
         List<AutoSync> activeSyncs = autoSyncRepository.findByEnabledTrue();
 
         if (activeSyncs.isEmpty()) {
-            log.info(" [자동 연동 스케줄러] 활성화된 지수가 없습니다. 작업을 종료합니다.");
+            log.info("[자동 연동 스케줄러] 활성화된 지수가 없습니다. 작업을 종료합니다.");
             return;
         }
 
-        // 2. 켜져 있는 지수들 순회 작업
         for (AutoSync sync : activeSyncs) {
-            try {
-                // 지수 정보(IndexInfo) 추출
-                var indexInfo = sync.getIndexInfo();
-                log.info(" 연동 대상 지수: {}", indexInfo.getIndexName());
+            IndexInfo indexInfo = sync.getIndexInfo();
+            log.info("[자동 연동] 연동 대상 지수: {}", indexInfo.getIndexName());
 
-                // 마지막 연동 날짜 구하기
-                // TODO: IndexDataRepository에서 이 지수의 가장 최근 baseDate를 조회하는 로직 필요
+            // 해당 지수의 가장 최근 baseDate 조회
+            LocalDate latestDate = indexDataRepository.findMaxBaseDateByIndexInfoId(indexInfo.getId());
 
-                LocalDate startDate = LocalDate.now().minusDays(1); // 임시 세팅
-                LocalDate endDate = LocalDate.now(); // 최신 날짜
+            // 장 마감(15:30) 후 데이터가 확정되므로 전일까지만 연동 (KST 기준)
+            LocalDate endDate = LocalDate.now(BUSINESS_ZONE).minusDays(1);
 
-                log.info("   - 연동 기간: {} ~ {}", startDate, endDate);
+            LocalDate startDate = (latestDate != null)
+                    ? latestDate.plusDays(1)
+                    : endDate.minusDays(6);
 
-                // 외부 API에서 데이터 가져오기 및 DB 저장
-                // TODO: 외부 API 호출 및 IndexData 저장 메서드 실행
+            if (startDate.isAfter(endDate)) {
+                log.info("[자동 연동] {}는 이미 최신 데이터 보유. 건너뜁니다.", indexInfo.getIndexName());
+                continue;
+            }
 
-            } catch (Exception e) {
-                // 하나의 지수가 실패해도 다른 지수들은 계속 연동
-                log.error("[자동 연동 실패] 지수명: {}, 원인: {}", sync.getIndexInfo().getIndexName(), e.getMessage());
+            log.info("[자동 연동] {} 연동 기간: {} ~ {}", indexInfo.getIndexName(), startDate, endDate);
+
+            LocalDate targetDate = startDate;
+            while (!targetDate.isAfter(endDate)) {
+                if (indexDataRepository.existsByIndexInfoIdAndBaseDate(indexInfo.getId(), targetDate)) {
+                    log.info("[자동 연동] {} {} 데이터 이미 존재. 건너뜁니다.", indexInfo.getIndexName(), targetDate);
+                    targetDate = targetDate.plusDays(1);
+                    continue;
+                }
+
+                String result = SUCCESS;
+                try {
+                    String baseDateStr = targetDate.format(DateTimeFormatter.BASIC_ISO_DATE);
+                    openApiService.syncAndSaveIndexData(indexInfo.getIndexName(), baseDateStr, 1, 100);
+                } catch (Exception e) {
+                    result = FAILED;
+                    log.error("[자동 연동 실패] 지수명: {}, 날짜: {}, 원인: {}",
+                            indexInfo.getIndexName(), targetDate, e.getMessage());
+                }
+
+                syncJobRepository.save(SyncJob.builder()
+                        .indexInfo(indexInfo)
+                        .jobType(INDEX_DATA_JOB)
+                        .targetDate(targetDate)
+                        .worker(SCHEDULER_WORKER)
+                        .jobTime(LocalDateTime.now(BUSINESS_ZONE))
+                        .result(result)
+                        .build());
+
+                targetDate = targetDate.plusDays(1);
             }
         }
 
-        log.info(" [자동 연동 스케줄러] 배치 작업이 모두 완료되었습니다!");
+        log.info("[자동 연동 스케줄러] 배치 작업이 모두 완료되었습니다!");
     }
 }

@@ -41,9 +41,9 @@ public class SyncJobSpecification {
                 );
             }
 
-            if (condition.worker() != null) {
+            if (condition.worker() != null && !condition.worker().isBlank()) {
                 predicates.add(
-                        cb.equal(root.get("worker"), condition.worker())
+                        cb.like(root.get("worker"), "%" + condition.worker() + "%")
                 );
             }
 

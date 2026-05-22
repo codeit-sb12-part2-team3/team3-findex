@@ -2,6 +2,7 @@ package com.codeit.findex.domain.autosync.repository;
 
 import com.codeit.findex.domain.autosync.entity.AutoSync;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +12,7 @@ public interface AutoSyncRepository extends JpaRepository<AutoSync, UUID>, AutoS
 
     Optional<AutoSync> findByIndexInfo_Id(UUID indexId);
 
-    // 스케줄러 사용 시 활성화
+    @Query("SELECT a FROM AutoSync a JOIN FETCH a.indexInfo WHERE a.enabled = true")
     List<AutoSync> findByEnabledTrue();
 
 }

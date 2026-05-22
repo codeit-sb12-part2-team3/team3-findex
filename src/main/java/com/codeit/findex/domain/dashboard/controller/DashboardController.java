@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/index-data")
@@ -29,9 +30,11 @@ public class DashboardController implements DashboardApi {
 
     @GetMapping("/performance/rank")
     public ResponseEntity<List<RankedIndexPerformanceDto>> getPerformanceRank(
-            @RequestParam(defaultValue = "MONTHLY") PeriodType periodType
+            @RequestParam(defaultValue = "DAILY") PeriodType periodType,
+            @RequestParam(required = false) UUID indexInfoId,
+            @RequestParam(defaultValue = "10") int limit
     ) {
-        return ResponseEntity.ok(dashboardService.getRankedPerformance(periodType));
+        return ResponseEntity.ok(dashboardService.getRankedPerformance(periodType, indexInfoId, limit));
     }
 
     @GetMapping("/{id}/chart")

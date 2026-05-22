@@ -36,3 +36,7 @@ spring:
 open-api:
   service-key: ${OPEN_API_SERVICE_KEY}
   base-url: https://apis.data.go.kr/1160100/service/GetMarketIndexInfoService
+
+scheduler:
+  auto-sync:
+    cron: "0 0 0 * * *"

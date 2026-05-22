@@ -36,9 +36,9 @@ public class SyncJobController implements SyncJobApi {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobTimeFrom,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobTimeTo,
-            @RequestParam(required = false)
+            @RequestParam(name = "cursor", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastJobTime,
-            @RequestParam(required = false) UUID lastId,
+            @RequestParam(name = "idAfter", required = false) UUID lastId,
             @RequestParam(required = false, defaultValue = "jobTime") String sortField,
             @RequestParam(required = false, defaultValue = "desc") String sortDirection,
             @RequestParam(defaultValue = "10") int size
@@ -54,11 +54,18 @@ public class SyncJobController implements SyncJobApi {
         return ResponseEntity.ok(response);
     }
 
+    private String normalizeIp(String remoteAddr) {
+        if ("::1".equals(remoteAddr) || "0:0:0:0:0:0:0:1".equals(remoteAddr)) {
+            return "127.0.0.1";
+        }
+        return remoteAddr;
+    }
+
     @PostMapping("/index-infos")
     public List<SyncJobDetailResponse> syncIndexInfo(
             HttpServletRequest request
     ) {
-        String workerIp = request.getRemoteAddr();
+        String workerIp = normalizeIp(request.getRemoteAddr());
         return syncJobService.syncIndexInfo(workerIp);
     }
 
@@ -67,7 +74,7 @@ public class SyncJobController implements SyncJobApi {
             @RequestBody SyncJobIndexDataSyncRequest requestDto,
             HttpServletRequest request
     ) {
-        String workerIp = request.getRemoteAddr();
+        String workerIp = normalizeIp(request.getRemoteAddr());
         return syncJobService.syncIndexData(
                 requestDto.indexInfoIds(),
                 requestDto.baseDateFrom(),
