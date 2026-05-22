@@ -28,7 +28,6 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, UUID> {
             OR i.indexName LIKE CONCAT('%', :indexName, '%'))
         AND (:favorite IS NULL
             OR i.favorite = :favorite)
-        ORDER BY i.indexClassification ASC
     """)
     List<IndexInfo> search(
             @Param("indexClassification") String indexClassification,

@@ -6,6 +6,7 @@ import com.codeit.findex.domain.syncjob.dto.SyncJobIndexDataSyncRequest;
 import com.codeit.findex.domain.syncjob.dto.SyncJobDetailResponse;
 import com.codeit.findex.domain.syncjob.dto.SyncJobSearchCondition;
 import com.codeit.findex.domain.syncjob.service.SyncJobService;
+import com.codeit.findex.global.util.UuidResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,11 +24,12 @@ import java.util.UUID;
 public class SyncJobController implements SyncJobApi {
 
     private final SyncJobService syncJobService;
+    private final UuidResolver uuidResolver;
 
     @GetMapping
     public ResponseEntity<CursorPageResponseSyncJobDto> getSyncJobList(
             @RequestParam(required = false) String jobType,
-            @RequestParam(name = "indexInfoId", required = false) UUID indexId,
+            @RequestParam(name = "indexInfoId", required = false) String indexInfoId,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate,
             @RequestParam(required = false) String worker,
@@ -43,6 +45,7 @@ public class SyncJobController implements SyncJobApi {
             @RequestParam(required = false, defaultValue = "desc") String sortDirection,
             @RequestParam(defaultValue = "10") int size
     ) {
+        UUID indexId = uuidResolver.resolve(indexInfoId);
         SyncJobSearchCondition condition = new SyncJobSearchCondition(
                 jobType, indexId, targetDate, worker, status, jobTimeFrom, jobTimeTo
         );

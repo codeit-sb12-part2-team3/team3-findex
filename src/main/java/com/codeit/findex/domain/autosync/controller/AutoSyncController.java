@@ -5,6 +5,7 @@ import com.codeit.findex.domain.autosync.dto.AutoSyncConfigDto;
 import com.codeit.findex.domain.autosync.dto.AutoSyncConfigUpdateRequest;
 import com.codeit.findex.domain.autosync.dto.CursorPageResponseAutoSyncConfigDto;
 import com.codeit.findex.domain.autosync.service.AutoSyncService;
+import com.codeit.findex.global.util.UuidResolver;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class AutoSyncController implements AutoSyncApi {
 
     private final AutoSyncService autoSyncService;
+    private final UuidResolver uuidResolver;
 
     /*
      * 1. 자동 연동 설정 목록 조회
@@ -26,11 +28,12 @@ public class AutoSyncController implements AutoSyncApi {
     @GetMapping
     public ResponseEntity<CursorPageResponseAutoSyncConfigDto> getAutoSyncConfigs(
             @RequestParam(name = "idAfter", required = false) UUID nextIdAfter,
-            @RequestParam(name = "indexInfoId", required = false) UUID indexId,
+            @RequestParam(name = "indexInfoId", required = false) String indexInfoId,
             @RequestParam(required = false) Boolean enabled,
             @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "10") int size) {
 
+        UUID indexId = uuidResolver.resolve(indexInfoId);
         CursorPageResponseAutoSyncConfigDto response =
                 autoSyncService.getAutoSyncConfigs(nextIdAfter, indexId, enabled, sort, size);
 

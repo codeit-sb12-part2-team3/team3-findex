@@ -3,6 +3,7 @@ package com.codeit.findex.domain.indexinfo.service;
 import com.codeit.findex.domain.indexdata.entity.SourceType;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoCreateRequest;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoResponse;
+import com.codeit.findex.domain.indexinfo.dto.IndexInfoSummaryDto;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoUpdateRequest;
 import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
@@ -11,6 +12,7 @@ import com.codeit.findex.global.exception.BusinessException;
 import com.codeit.findex.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,15 +101,20 @@ public class IndexInfoService {
     public CursorPageResponse<IndexInfoResponse> findAll(
             String indexClassification,
             String indexName,
-            Boolean favorite
+            Boolean favorite,
+            String sortField,
+            String sortDirection
     ) {
+        String field = (sortField != null && !sortField.isBlank()) ? sortField : "indexClassification";
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort sort = Sort.by(direction, field).and(Sort.by(Sort.Direction.ASC, "id"));
 
         List<IndexInfoResponse> content = indexInfoRepository
                 .search(
                         indexClassification,
                         indexName,
                         favorite,
-                        PageRequest.of(0, 100)
+                        PageRequest.of(0, 100, sort)
                 )
                 .stream()
                 .map(this::toResponse)
@@ -124,11 +131,30 @@ public class IndexInfoService {
     }
 
     @Transactional(readOnly = true)
-    public List<IndexInfoResponse> getSummaries() {
+    public List<IndexInfoSummaryDto> getSummaries() {
         return indexInfoRepository.findAll()
                 .stream()
-                .map(this::toResponse)
+                .map(info -> new IndexInfoSummaryDto(
+                        numericId(info.getId()),
+                        info.getIndexName(),
+                        info.getIndexClassification()
+                ))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public UUID getUuidByNumericId(int numericId) {
+        return indexInfoRepository.findAll().stream()
+                .filter(info -> numericId(info.getId()) == numericId)
+                .map(IndexInfo::getId)
+                .findFirst()
+                .orElse(null);
+    }
+
+    // UUID → 프론트 Number()로 파싱 가능한 정수 ID
+    public static int numericId(UUID uuid) {
+        int h = uuid.hashCode();
+        return h == 0 ? 1 : h;
     }
 
     // 단건 조회

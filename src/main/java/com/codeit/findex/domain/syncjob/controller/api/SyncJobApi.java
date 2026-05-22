@@ -62,9 +62,9 @@ public interface SyncJobApi {
             @RequestParam(required = false)
             String jobType,
 
-            @Parameter(description="지수 ID")
+            @Parameter(description="지수 ID (UUID 또는 numeric ID)")
             @RequestParam(name="indexInfoId",required=false)
-            UUID indexId,
+            String indexInfoId,
 
             @Parameter(description="대상 날짜")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

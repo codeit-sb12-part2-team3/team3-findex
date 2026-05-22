@@ -9,6 +9,7 @@ import com.codeit.findex.domain.indexinfo.entity.IndexInfo;
 import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
 import com.codeit.findex.global.exception.BusinessException;
 import com.codeit.findex.global.exception.ErrorCode;
+import com.codeit.findex.global.util.UuidResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Limit;
@@ -30,13 +31,15 @@ public class IndexDataService {
     private final IndexDataRepository indexDataRepository;
     private final IndexDataMapper mapper;
     private final IndexInfoRepository indexInfoRepository;
+    private final UuidResolver uuidResolver;
 
     @Transactional
     public IndexDataDto create(IndexDataCreateRequest newIndexData, SourceType sourceType) {
-        IndexInfo indexInfo = indexInfoRepository.findById(newIndexData.indexInfoId())
+        UUID resolvedId = uuidResolver.resolve(newIndexData.indexInfoId());
+        IndexInfo indexInfo = indexInfoRepository.findById(resolvedId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
 
-        if (indexDataRepository.existsByIndexInfoIdAndBaseDate(newIndexData.indexInfoId(), newIndexData.baseDate())) {
+        if (indexDataRepository.existsByIndexInfoIdAndBaseDate(resolvedId, newIndexData.baseDate())) {
             throw new BusinessException(ErrorCode.DUPLICATE_INDEX_DATA);
         }
 

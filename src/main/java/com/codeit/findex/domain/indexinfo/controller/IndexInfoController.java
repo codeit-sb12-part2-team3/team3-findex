@@ -3,6 +3,7 @@ package com.codeit.findex.domain.indexinfo.controller;
 import com.codeit.findex.domain.indexinfo.controller.api.IndexInfoApi;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoCreateRequest;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoResponse;
+import com.codeit.findex.domain.indexinfo.dto.IndexInfoSummaryDto;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoUpdateRequest;
 import com.codeit.findex.domain.indexinfo.service.IndexInfoService;
 import com.codeit.findex.global.common.dto.CursorPageResponse;
@@ -39,16 +40,17 @@ public class IndexInfoController implements IndexInfoApi {
     public ResponseEntity<CursorPageResponse<IndexInfoResponse>> findAll(
             @RequestParam(required = false) String indexClassification,
             @RequestParam(required = false) String indexName,
-            @RequestParam(required = false) Boolean favorite
+            @RequestParam(required = false) Boolean favorite,
+            @RequestParam(required = false, defaultValue = "indexClassification") String sortField,
+            @RequestParam(required = false, defaultValue = "asc") String sortDirection
     ) {
         return ResponseEntity.ok(
-                indexInfoService.findAll(indexClassification, indexName, favorite)
+                indexInfoService.findAll(indexClassification, indexName, favorite, sortField, sortDirection)
         );
     }
 
     @GetMapping("/summaries")
-
-    public ResponseEntity<List<IndexInfoResponse>> getSummaries() {
+    public ResponseEntity<List<IndexInfoSummaryDto>> getSummaries() {
         return ResponseEntity.ok(indexInfoService.getSummaries());
     }
 

@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record SyncJobDetailResponse(
         UUID id,
-        UUID indexInfoId,
+        int indexInfoId,
         String indexName,
         String jobType,
         LocalDate targetDate,
@@ -17,9 +17,11 @@ public record SyncJobDetailResponse(
         String result
 ){
     public static SyncJobDetailResponse from(SyncJob syncJob) {
+        UUID uuid = syncJob.getIndexInfo().getId();
+        int numericId = uuid.hashCode() == 0 ? 1 : uuid.hashCode();
         return new SyncJobDetailResponse(
                 syncJob.getId(),
-                syncJob.getIndexInfo().getId(),
+                numericId,
                 syncJob.getIndexInfo().getIndexName(),
                 syncJob.getJobType(),
                 syncJob.getTargetDate(),

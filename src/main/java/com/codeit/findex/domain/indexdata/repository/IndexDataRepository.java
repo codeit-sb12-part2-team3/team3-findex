@@ -45,6 +45,28 @@ public interface IndexDataRepository extends JpaRepository<IndexData, UUID>, Ind
     LocalDate findGlobalMaxBaseDate();
 
     @Query("SELECT d FROM IndexData d JOIN FETCH d.indexInfo i " +
+            "WHERE d.baseDate = (SELECT MIN(sub.baseDate) FROM IndexData sub " +
+            "                    WHERE sub.indexInfo.id = d.indexInfo.id " +
+            "                    AND sub.baseDate BETWEEN :startDate AND :endDate) " +
+            "AND (:indexInfoId IS NULL OR d.indexInfo.id = :indexInfoId)")
+    List<IndexData> findEarliestDataPerIndexInPeriod(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("indexInfoId") UUID indexInfoId
+    );
+
+    @Query("SELECT d FROM IndexData d JOIN FETCH d.indexInfo i " +
+            "WHERE d.baseDate = (SELECT MAX(sub.baseDate) FROM IndexData sub " +
+            "                    WHERE sub.indexInfo.id = d.indexInfo.id " +
+            "                    AND sub.baseDate BETWEEN :startDate AND :endDate) " +
+            "AND (:indexInfoId IS NULL OR d.indexInfo.id = :indexInfoId)")
+    List<IndexData> findLatestDataPerIndexInPeriod(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("indexInfoId") UUID indexInfoId
+    );
+
+    @Query("SELECT d FROM IndexData d JOIN FETCH d.indexInfo i " +
             "WHERE i.favorite = true " +
             "AND d.baseDate = (SELECT MAX(sub.baseDate) FROM IndexData sub WHERE sub.indexInfo.id = d.indexInfo.id)")
     List<IndexData> findLatestFavoriteIndexData();
