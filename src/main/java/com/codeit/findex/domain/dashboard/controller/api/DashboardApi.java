@@ -87,8 +87,16 @@ public interface DashboardApi {
     ResponseEntity<List<RankedIndexPerformanceDto>> getPerformanceRank(
 
             @Parameter(description="조회 기간")
-            @RequestParam(defaultValue="MONTHLY")
-            PeriodType periodType
+            @RequestParam(defaultValue="DAILY")
+            PeriodType periodType,
+
+            @Parameter(description="지수 ID (선택)")
+            @RequestParam(required = false)
+            UUID indexInfoId,
+
+            @Parameter(description="조회 개수 (기본 10)")
+            @RequestParam(defaultValue = "10")
+            int limit
     );
 
 

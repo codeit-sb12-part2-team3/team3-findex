@@ -15,6 +15,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -29,19 +30,37 @@ public class DashboardService {
 
     // 즐겨찾기 요약
     public List<IndexPerformanceDto> getFavoritePerformance(PeriodType periodType) {
+        List<IndexInfo> favorites = indexInfoRepository.findByFavoriteTrue();
+        if (favorites.isEmpty()) return List.of();
+
         List<IndexData> favoriteData = indexDataRepository.findLatestFavoriteIndexData();
-        return favoriteData.stream()
-                .map(this::mapToPerformanceDto)
+        Map<UUID, IndexData> dataByInfoId = favoriteData.stream()
+                .collect(Collectors.toMap(d -> d.getIndexInfo().getId(), d -> d));
+
+        return favorites.stream()
+                .map(info -> {
+                    IndexData data = dataByInfoId.get(info.getId());
+                    if (data != null) return mapToPerformanceDto(data);
+                    return IndexPerformanceDto.builder()
+                            .indexInfoId(info.getId())
+                            .indexClassification(info.getIndexClassification())
+                            .indexName(info.getIndexName())
+                            .versus(BigDecimal.ZERO)
+                            .fluctuationRate(BigDecimal.ZERO)
+                            .currentPrice(BigDecimal.ZERO)
+                            .beforePrice(BigDecimal.ZERO)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
     // 성과 랭킹
-    public List<RankedIndexPerformanceDto> getRankedPerformance(PeriodType periodType) {
-        LocalDate endDate = LocalDate.now();
+    public List<RankedIndexPerformanceDto> getRankedPerformance(PeriodType periodType, UUID indexInfoId, int limit) {
+        LocalDate endDate = indexDataRepository.findGlobalMaxBaseDate();
+        if (endDate == null) return List.of();
         LocalDate startDate = periodType.getStartDate(endDate);
 
-        // 상위 10개 추출
-        List<IndexData> topData = indexDataRepository.findTopRankedIndexData(startDate, endDate, PageRequest.of(0, 10));
+        List<IndexData> topData = indexDataRepository.findTopRankedIndexData(startDate, endDate, indexInfoId, PageRequest.of(0, limit));
 
         return IntStream.range(0, topData.size())
                 .mapToObj(i -> RankedIndexPerformanceDto.builder()
@@ -56,7 +75,8 @@ public class DashboardService {
         IndexInfo indexInfo = indexInfoRepository.findById(indexInfoId)
                 .orElseThrow(() -> new IllegalArgumentException("지수 정보가 없습니다."));
 
-        LocalDate endDate = LocalDate.now();
+        LocalDate latestDate = indexDataRepository.findMaxBaseDateByIndexInfoId(indexInfoId);
+        LocalDate endDate = latestDate != null ? latestDate : LocalDate.now();
         LocalDate startDate = periodType.getStartDate(endDate);
 
         List<IndexData> dataList = indexDataRepository.findByIndexInfoIdAndBaseDateBetweenOrderByBaseDateAsc(indexInfoId, startDate, endDate);

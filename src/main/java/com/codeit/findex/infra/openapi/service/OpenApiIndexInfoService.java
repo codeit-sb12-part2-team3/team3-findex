@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -24,7 +26,7 @@ public class OpenApiIndexInfoService {
                         item.getIdxNm(),
                         item.getIdxCsf(),
                         toInteger(item.getEpyItmsCnt()),
-                        null,
+                        parseBasPntm(item.getBasPntm()),
                         toBigDecimal(item.getBasIdx()),
                         false
                 ))
@@ -38,7 +40,7 @@ public class OpenApiIndexInfoService {
                 item.getIdxNm(),
                 item.getIdxCsf(),
                 toInteger(item.getEpyItmsCnt()),
-                null,
+                parseBasPntm(item.getBasPntm()),
                 toBigDecimal(item.getBasIdx()),
                 false
         );
@@ -51,5 +53,41 @@ public class OpenApiIndexInfoService {
 
     private BigDecimal toBigDecimal(String value) {
         return value == null ? null : new BigDecimal(value);
+    }
+
+    // basPntm 다양한 형식 파싱
+    private LocalDate parseBasPntm(String basPntm) {
+        if (basPntm == null || basPntm.isBlank()) return null;
+        String trimmed = basPntm.trim();
+
+        // YYYYMMDD
+        try {
+            return LocalDate.parse(trimmed, DateTimeFormatter.BASIC_ISO_DATE);
+        } catch (Exception ignored) { }
+
+        // YYYY.MM.DD
+        try {
+            return LocalDate.parse(trimmed, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        } catch (Exception ignored) { }
+
+        // YYYY년 M월 D일
+        try {
+            return LocalDate.parse(trimmed, DateTimeFormatter.ofPattern("yyyy년 M월 d일"));
+        } catch (Exception ignored) { }
+
+        // YYYY년MM월DD일
+        try {
+            return LocalDate.parse(trimmed, DateTimeFormatter.ofPattern("yyyy년MM월dd일"));
+        } catch (Exception ignored) { }
+
+        // 연도만 ("YYYY")
+        try {
+            int year = Integer.parseInt(trimmed);
+            if (year >= 1900 && year <= 2100) {
+                return LocalDate.of(year, 1, 1);
+            }
+        } catch (Exception ignored) { }
+
+        return null;
     }
 }

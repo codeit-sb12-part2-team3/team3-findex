@@ -187,9 +187,13 @@ public class IndexInfoService {
                 ? request.baseIndex()
                 : indexInfo.getBaseIndex();
 
+        LocalDate safeBasePointInTime = request.basePointInTime() != null
+                ? request.basePointInTime()
+                : indexInfo.getBasePointInTime();
+
         indexInfo.updateMarketInfo(
                 request.employedItemsCount(),
-                indexInfo.getBasePointInTime(),
+                safeBasePointInTime,
                 safeBaseIndex,
                 indexInfo.getFavorite()
         );

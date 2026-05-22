@@ -42,6 +42,9 @@ public class IndexDataRepositoryCustomImpl implements IndexDataRepositoryCustom 
         boolean isAsc = "asc".equalsIgnoreCase(searchRequest.sortDirection());
 
         // size+1을 조회하여 다음 페이지가 존재하는지 확인
+        Order order = isAsc ? Order.ASC : Order.DESC;
+        PathBuilder<IndexData> entityPath = new PathBuilder<>(IndexData.class, "indexData");
+
         List<IndexData> content = queryFactory
                 .selectFrom(indexData)
                 .where(
@@ -49,7 +52,10 @@ public class IndexDataRepositoryCustomImpl implements IndexDataRepositoryCustom 
                         betweenBaseDate(searchRequest.startDate(), searchRequest.endDate()),
                         dynamicCursorCondition(sortField, searchRequest.cursor(), searchRequest.idAfter(), isAsc)
                 )
-                .orderBy(createOrderSpecifier(sortField, isAsc))
+                .orderBy(
+                        new OrderSpecifier<>(order, entityPath.getComparable(sortField, Comparable.class)),
+                        new OrderSpecifier<>(order, indexData.id)
+                )
                 .limit(pageSize + 1)
                 .fetch();
 
@@ -108,12 +114,6 @@ public class IndexDataRepositoryCustomImpl implements IndexDataRepositoryCustom 
             return targetField.lt(cursor)
                     .or(targetField.eq(cursor).and(indexData.id.lt(idAfter)));
         }
-    }
-
-    private OrderSpecifier<?> createOrderSpecifier(String sortField, boolean isAsc) {
-        Order order = isAsc ? Order.ASC : Order.DESC;
-        PathBuilder<IndexData> entityPath = new PathBuilder<>(IndexData.class, "indexData");
-        return new OrderSpecifier<>(order, entityPath.getComparable(sortField, Comparable.class));
     }
 
 }

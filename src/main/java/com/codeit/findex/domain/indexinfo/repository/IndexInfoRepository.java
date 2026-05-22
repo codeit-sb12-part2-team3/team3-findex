@@ -16,6 +16,8 @@ public interface IndexInfoRepository extends JpaRepository<IndexInfo, UUID> {
 
     List<IndexInfo> findByIndexNameIn(List<String> indexNames);
 
+    List<IndexInfo> findByFavoriteTrue();
+
     @Query("""
         SELECT i FROM IndexInfo i
         WHERE (:indexClassification IS NULL
