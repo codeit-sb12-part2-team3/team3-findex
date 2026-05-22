@@ -14,6 +14,11 @@ public enum ErrorCode {
             "잘못된 매개변수 요청입니다."
     ),
 
+    DUPLICATE_INDEX_DATA(
+            HttpStatus.BAD_REQUEST,
+            "해당 지수와 날짜의 데이터가 이미 존재합니다."
+    ),
+
     NOT_FOUND(
             HttpStatus.NOT_FOUND,
             "요청한 데이터를 찾을 수 없습니다."

@@ -33,9 +33,14 @@ public class IndexDataService {
 
     @Transactional
     public IndexDataDto create(IndexDataCreateRequest newIndexData, SourceType sourceType) {
-        IndexData indexData = mapper.toIndexData(newIndexData);
         IndexInfo indexInfo = indexInfoRepository.findById(newIndexData.indexInfoId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND));
+
+        if (indexDataRepository.existsByIndexInfoIdAndBaseDate(newIndexData.indexInfoId(), newIndexData.baseDate())) {
+            throw new BusinessException(ErrorCode.DUPLICATE_INDEX_DATA);
+        }
+
+        IndexData indexData = mapper.toIndexData(newIndexData);
         indexData.setIndexInfo(indexInfo);
         indexData.setSourceType(sourceType);
         indexData = indexDataRepository.save(indexData);
