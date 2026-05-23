@@ -40,4 +40,4 @@ open-api:
 scheduler:
   auto-sync:
     enabled: true
-    cron: "0 10 3 * * *"
+    cron: "0 * * * * *"
