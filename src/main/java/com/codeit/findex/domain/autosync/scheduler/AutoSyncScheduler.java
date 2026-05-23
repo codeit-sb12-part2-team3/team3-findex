@@ -36,7 +36,7 @@ public class AutoSyncScheduler {
     private final OpenApiService openApiService;
     private final SyncJobRepository syncJobRepository;
 
-    @Scheduled(cron = "${scheduler.auto-sync.cron}")
+    @Scheduled(cron = "${scheduler.auto-sync.cron}", zone = "Asia/Seoul")
     public void runAutoSyncBatch() {
         log.info("[자동 연동 스케줄러] 매일 자정 배치 작업을 시작합니다...");
 
