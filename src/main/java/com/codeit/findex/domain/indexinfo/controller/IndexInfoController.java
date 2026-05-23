@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -58,7 +57,7 @@ public class IndexInfoController implements IndexInfoApi {
     // 지수 정보 단건 조회 API
     @GetMapping("/{id}")
     public ResponseEntity<IndexInfoResponse> findById(
-            @PathVariable UUID id
+            @PathVariable String id
     ) {
         return ResponseEntity.ok(
                 indexInfoService.findById(id)
@@ -68,7 +67,7 @@ public class IndexInfoController implements IndexInfoApi {
     // 지수 정보 수정 API
     @PatchMapping("/{id}")
     public ResponseEntity<IndexInfoResponse> update(
-            @PathVariable UUID id,
+            @PathVariable String id,
             @RequestBody IndexInfoUpdateRequest request
     ) {
         return ResponseEntity.ok(
@@ -79,7 +78,7 @@ public class IndexInfoController implements IndexInfoApi {
     // 지수 정보 삭제 API
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-            @PathVariable UUID id
+            @PathVariable String id
     ) {
         indexInfoService.delete(id);
         return ResponseEntity.noContent().build();
