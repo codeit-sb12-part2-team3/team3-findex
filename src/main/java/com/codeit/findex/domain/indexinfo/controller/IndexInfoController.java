@@ -7,12 +7,14 @@ import com.codeit.findex.domain.indexinfo.dto.IndexInfoSummaryDto;
 import com.codeit.findex.domain.indexinfo.dto.IndexInfoUpdateRequest;
 import com.codeit.findex.domain.indexinfo.service.IndexInfoService;
 import com.codeit.findex.global.common.dto.CursorPageResponse;
+import com.codeit.findex.global.util.UuidResolver;
 import com.codeit.findex.infra.openapi.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class IndexInfoController implements IndexInfoApi {
     // 지수 정보 Service
     private final IndexInfoService indexInfoService;
     private final OpenApiService openApiService;
+    private final UuidResolver uuidResolver;
 
     // 지수 정보 등록 API
     @PostMapping
@@ -60,7 +63,7 @@ public class IndexInfoController implements IndexInfoApi {
             @PathVariable String id
     ) {
         return ResponseEntity.ok(
-                indexInfoService.findById(id)
+                indexInfoService.findById(uuidResolver.resolve(id))
         );
     }
 
@@ -71,7 +74,7 @@ public class IndexInfoController implements IndexInfoApi {
             @RequestBody IndexInfoUpdateRequest request
     ) {
         return ResponseEntity.ok(
-                indexInfoService.update(id, request)
+                indexInfoService.update(uuidResolver.resolve(id), request)
         );
     }
 
@@ -80,7 +83,7 @@ public class IndexInfoController implements IndexInfoApi {
     public ResponseEntity<Void> delete(
             @PathVariable String id
     ) {
-        indexInfoService.delete(id);
+        indexInfoService.delete(uuidResolver.resolve(id));
         return ResponseEntity.noContent().build();
     }
 }

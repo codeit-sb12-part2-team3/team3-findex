@@ -10,7 +10,6 @@ import com.codeit.findex.domain.indexinfo.repository.IndexInfoRepository;
 import com.codeit.findex.global.common.dto.CursorPageResponse;
 import com.codeit.findex.global.exception.BusinessException;
 import com.codeit.findex.global.exception.ErrorCode;
-import com.codeit.findex.global.util.UuidResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -31,7 +30,6 @@ import java.util.stream.Collectors;
 public class IndexInfoService {
 
     private final IndexInfoRepository indexInfoRepository;
-    private final UuidResolver uuidResolver;
 
     // 사용자 등록 지수 정보
     public IndexInfoResponse create(IndexInfoCreateRequest request) {
@@ -161,15 +159,13 @@ public class IndexInfoService {
 
     // 단건 조회
     @Transactional(readOnly = true)
-    public IndexInfoResponse findById(String id) {
-        UUID uuid = uuidResolver.resolve(id);
-        return toResponse(getIndexInfo(uuid));
+    public IndexInfoResponse findById(UUID id) {
+        return toResponse(getIndexInfo(id));
     }
 
     // 수정
-    public IndexInfoResponse update(String id, IndexInfoUpdateRequest request) {
-        UUID uuid = uuidResolver.resolve(id);
-        IndexInfo indexInfo = getIndexInfo(uuid);
+    public IndexInfoResponse update(UUID id, IndexInfoUpdateRequest request) {
+        IndexInfo indexInfo = getIndexInfo(id);
 
         indexInfo.updateMarketInfo(
                 request.employedItemsCount(),
@@ -182,10 +178,9 @@ public class IndexInfoService {
     }
 
     // 삭제
-    public void delete(String id) {
-        UUID uuid = uuidResolver.resolve(id);
-        getIndexInfo(uuid);
-        indexInfoRepository.deleteById(uuid);
+    public void delete(UUID id) {
+        getIndexInfo(id);
+        indexInfoRepository.deleteById(id);
         indexInfoRepository.flush();
     }
 
