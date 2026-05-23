@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @Tag(
         name = "지수 정보 API",
@@ -112,7 +111,7 @@ public interface IndexInfoApi {
     ResponseEntity<IndexInfoResponse> findById(
 
             @Parameter(description="지수 ID")
-            @PathVariable UUID id
+            @PathVariable String id
     );
 
 
@@ -127,7 +126,7 @@ public interface IndexInfoApi {
     ResponseEntity<IndexInfoResponse> update(
 
             @Parameter(description="지수 ID")
-            @PathVariable UUID id,
+            @PathVariable String id,
 
             @RequestBody
             IndexInfoUpdateRequest request
@@ -145,6 +144,6 @@ public interface IndexInfoApi {
     ResponseEntity<Void> delete(
 
             @Parameter(description="지수 ID")
-            @PathVariable UUID id
+            @PathVariable String id
     );
 }
