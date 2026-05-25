@@ -2,16 +2,18 @@
 https://www.notion.so/Part_Team3-360a0dc3f7b680369764f847a959e9e8?source=copy_link
 
 ## 팀원 구성 
- 박교현 (팀장) : https://github.com/hyeon2628?tab=repositories  
+ 박교현 [팀장] : https://github.com/hyeon2628?tab=repositories  
  여운정 : https://github.com/novafterg1ow  
  이주혜 : https://github.com/Jerong81  
  이태형 : https://github.com/lth0415-tech  
  정우진 : https://github.com/zinzin68  
 
 ## 프로젝트 소개
-- Findex : 외부 Open API와 연동하여 금융 지수 데이터를 제공하는 대시보드 서비스의 백엔드 시스템을 구축하였습니다.
-- 직관적인 UI에서 금융 지수의 흐름을 파악하고, 자동 연동 기능을 통해 최신 데이터를 분석할 수 있습니다.
-- 지수별 성과 분석, 이동평균선 계산, 자동 데이터 업데이트 기능을 통해 가볍고 강력한 금융 분석 도구를 제공합니다.
+- Findex  
+  : 외부 Open API와 연동하여 금융 지수 데이터를 제공하는 대시보드 서비스의 백엔드 시스템을 구축하였습니다.
+- 지수별 성과 분석, 이동평균선 차트, 관심 지수 등록 등의 기능을 통해 금융 지수들의 흐름을 직관적으로 확인할 수 있습니다.
+- Open API 자동 연동 업데이트 기능을 통해 최신 금융 데이터를 빠르게 반영해 신뢰성 있는 금융 지수 정보를 제공합니다.
+
 - 프로젝트 기간: 2026.05.14 ~ 2026.05.26
 
 ## 기술 스택
@@ -20,7 +22,7 @@ https://www.notion.so/Part_Team3-360a0dc3f7b680369764f847a959e9e8?source=copy_li
 - Documentation: springdoc-openapi (Swagger)
 - Scheduling: Spring Scheduler
 - Utility: MapStruct, Query DSL
-- 배포 및 협업: Railway.io / Git & GitHub, Jira, Discord
+- 배포 및 협업: Railway.io / Git & GitHub, Jira, Discord, Notion
 
 ## 팀원별 구현 기능 상세
 #### 박교현
@@ -50,8 +52,8 @@ https://www.notion.so/Part_Team3-360a0dc3f7b680369764f847a959e9e8?source=copy_li
     - 자동 연동 설정 수정 API
     - 자동 연동 설정 목록 조회 API
     - cursor 기반 Index Info 목록 페이지네이션 구현
-  - 프론트 엔드 연동 설정
-
+  - 프론트 엔드 연동 설정 및 최적화
+    
 #### 이주혜
   - Open API 설정
     - Open API 호출 로직 구현
@@ -208,7 +210,7 @@ src
 ```
 
 ## 구현 홈페이지
-(개발한 홈페이지 링크 게시)
+https://team3-findex-copy-production.up.railway.app
 
 ## 프로젝트 회고록
 (발표 자료 링크 혹은 첨부파일)
