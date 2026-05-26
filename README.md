@@ -349,5 +349,5 @@ src
 
 </br>
 
-## 📝 프로젝트 회고록
-[🔗 프로젝트 문서](https://drive.google.com/file/d/1B-k_-SRJDBUu4OxDyhn7jqJI2Nc80qKv/view?usp=drive_link)
+## 📝 프로젝트 자료
+[🔗 프로젝트 자료](https://drive.google.com/file/d/1B-k_-SRJDBUu4OxDyhn7jqJI2Nc80qKv/view?usp=drive_link)
