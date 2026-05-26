@@ -213,4 +213,4 @@ src
 https://team3-findex-copy-production.up.railway.app
 
 ## 프로젝트 회고록
-(발표 자료 링크 혹은 첨부파일)
+https://drive.google.com/file/d/1B-k_-SRJDBUu4OxDyhn7jqJI2Nc80qKv/view?usp=drive_link
